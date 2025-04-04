@@ -1,0 +1,118 @@
+{
+  "project_info": {
+    "project_number": "870684138447",
+    "project_id": "gymcreditcapstone",
+    "storage_bucket": "gymcreditcapstone.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870684138447:android:6e5bc99ff52204ca46d0ba",
+        "android_client_info": {
+          "package_name": "com.example.capstone_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "870684138447-81koml7irvvnfvqg14ctuhggn1s59i6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb_tidtQt5PCAP6ZH9fMGnzXp3KmcBdxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "870684138447-81koml7irvvnfvqg14ctuhggn1s59i6c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "870684138447-v5upniqk7pqm6tcrqpciukipdvumlb4i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.capstone1"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870684138447:android:fceb16cb3fce908a46d0ba",
+        "android_client_info": {
+          "package_name": "com.example.capstone_1.gym_credit_capstone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "870684138447-81koml7irvvnfvqg14ctuhggn1s59i6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb_tidtQt5PCAP6ZH9fMGnzXp3KmcBdxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "870684138447-81koml7irvvnfvqg14ctuhggn1s59i6c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "870684138447-v5upniqk7pqm6tcrqpciukipdvumlb4i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.capstone1"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870684138447:android:83f0dff1e5bb8ed146d0ba",
+        "android_client_info": {
+          "package_name": "com.example.capstonedesigngym"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "870684138447-81koml7irvvnfvqg14ctuhggn1s59i6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb_tidtQt5PCAP6ZH9fMGnzXp3KmcBdxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "870684138447-81koml7irvvnfvqg14ctuhggn1s59i6c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "870684138447-v5upniqk7pqm6tcrqpciukipdvumlb4i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.capstone1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

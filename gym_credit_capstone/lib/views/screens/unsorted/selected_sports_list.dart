@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../screens/unsorted/gym_info_page.dart';
+import 'package:provider/provider.dart';
+import 'package:gym_credit_capstone/view_models/filtered_gym_view_model.dart';
 
 class SelectedSportsList extends StatefulWidget {
   final List<String> selectedSports;
@@ -12,111 +12,112 @@ class SelectedSportsList extends StatefulWidget {
 }
 
 class _SelectedSportsListState extends State<SelectedSportsList> {
-  String? selectedOption = null; // 기본 필터를 "해당 없음"으로 설정
-  String filterText = "해당 없음"; // 버튼 텍스트의 기본값
+  String? selectedOption; // 현재 선택된 필터 옵션
+  String filterText = "해당 없음"; // 버튼 텍스트 기본값
 
-  // 옵션을 선택할 때 실행
+  @override
+  void initState() {
+    super.initState();
+    _loadFilteredGyms(); // 초기 데이터 로드
+  }
+
+  Future<void> _loadFilteredGyms() async {
+    await context.read<FilteredGymViewModel>().filterGymsBySports(
+        widget.selectedSports);
+  }
+
   void onOptionSelected(String? option) {
     setState(() {
       selectedOption = option;
-      filterText = option ?? "해당 없음"; // 옵션 선택에 따라 텍스트 변경
+      filterText = option ?? "해당 없음";
     });
     print("선택된 필터 옵션: ${selectedOption ?? "해당 없음"}");
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("선택한 스포츠")),
-      body: Column(
-        children: [
-          // 상단에 하나의 버튼 추가
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: ElevatedButton(
-              onPressed: () async {
-                final option = await showModalBottomSheet<String>(
-                  context: context,
-                  builder: (context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: Text("무료"),
-                          onTap: () => Navigator.pop(context, "무료"),
+    // 필터링된 체육관 리스트를 ViewModel에서 가져오기
+    return Builder(
+      builder: (context) {
+        final filteredGyms = context
+            .watch<FilteredGymViewModel>()
+            .filteredGyms;
+
+        return Scaffold(
+          appBar: AppBar(title: const Text("선택한 스포츠")),
+          body: Column(
+            children: [
+              // 필터 옵션 버튼
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final option = await showModalBottomSheet<String>(
+                      context: context,
+                      builder: (context) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text("무료"),
+                              onTap: () => Navigator.pop(context, "무료"),
+                            ),
+                            ListTile(
+                              title: const Text("유료"),
+                              onTap: () => Navigator.pop(context, "유료"),
+                            ),
+                            ListTile(
+                              title: const Text("해당 없음"),
+                              onTap: () => Navigator.pop(context, null),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    onOptionSelected(option);
+                  },
+                  child: Text("무료/유료: $filterText"),
+                ),
+              ),
+              // 필터링된 체육관 표시
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredGyms.length,
+                  itemBuilder: (context, index) {
+                    final gym = filteredGyms[index];
+
+                    // 선택된 필터 옵션에 따라 표시
+                    if (selectedOption == "무료" && gym.isPaid == true) {
+                      return Container(); // 유료인 경우 필터링 제외
+                    }
+                    if (selectedOption == "유료" && gym.isPaid == false) {
+                      return Container(); // 무료인 경우 필터링 제외
+                    }
+
+                    return ListTile(
+                      title: Text(gym.name),
+                      subtitle: Text("요금: ${gym.isPaid ? '유료' : '무료'}"),
+                      onTap: () {
+                        print("testing");
+                        /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GymInfoPage(
+                            roadName: gym.location ?? "정보 없음",
+                            gymName: gym.name,
+                            openTime: gym.facilityHours ?? "정보 없음",
+                          ),
                         ),
-                        ListTile(
-                          title: Text("유료"),
-                          onTap: () => Navigator.pop(context, "유료"),
-                        ),
-                        ListTile(
-                          title: Text("해당 없음"),
-                          onTap: () => Navigator.pop(context, null),
-                        ),
-                      ],
+                      );*/
+                      },
                     );
                   },
-                );
-                onOptionSelected(option);
-              },
-              child: Text("무료/유료: $filterText"), // 초기 텍스트는 "해당 없음"
-            ),
+                ),
+              ),
+            ],
           ),
-          // StreamBuilder로 체육관 리스트 표시
-          Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('Gym_list').snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                final docs = snapshot.data!.docs;
-
-                // 필터링된 체육관 리스트
-                final filteredDocs = docs.where((doc) {
-                  final bool? isPaid = doc['유료']; // '유료' 필드 기반 필터링
-                  if (selectedOption == "무료") {
-                    return isPaid == false;
-                  } else if (selectedOption == "유료") {
-                    return isPaid == true;
-                  }
-                  return true; // "해당 없음"인 경우 모두 포함
-                }).toList();
-
-                return ListView.builder(
-                  itemCount: filteredDocs.length,
-                  itemBuilder: (context, index) {
-                    final doc = filteredDocs[index];
-
-                    if (doc.exists) {
-                      final String gymName = doc.id;
-
-                      return ListTile(
-                        title: Text(gymName),
-                        subtitle: Text("요금: ${doc['유료'] == true ? '유료' : '무료'}"),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => GymInfoPage(
-                                roadName: doc['도로명'] ?? "정보 없음",
-                                gymName: gymName,
-                                openTime: doc['운영시간'] ?? "정보 없음",
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                    return Container();
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

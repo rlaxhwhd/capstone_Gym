@@ -6,6 +6,7 @@ import 'schedule/schedule_page.dart';
 import 'profile/profile_page.dart';
 import 'meetup/meetup_page.dart';
 import 'qrcode/qrcode_page.dart';
+import 'package:flutter/services.dart';
 
 
 class MainScreen extends StatelessWidget {
@@ -13,6 +14,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ChangeNotifierProvider(
       create: (_) => MainViewModel(),
       child: Consumer<MainViewModel>(

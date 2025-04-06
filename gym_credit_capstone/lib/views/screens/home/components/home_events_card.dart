@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../data/models/gym_info_model.dart';
-import 'package:intl/intl.dart';
+import '../../../common_widgets/tag_widget.dart';
 
 class HomeCard extends StatelessWidget {
   final GymInfo gymInfo;
@@ -10,97 +10,83 @@ class HomeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      // HomeCard의 부모에서 카드 자체를 가운데 정렬
       child: SizedBox(
-        height: 250,
-        width: 270,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-          child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 왼쪽 정렬
-              children: [
-                // 이미지 추가
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                  ),
-                  child: Image.asset(
-                    gymInfo.imageUrl,
-                    width: double.infinity,
-                    height: 150,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Padding(
-                  padding: const EdgeInsets.only(left: 18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 왼쪽 정렬
-                    children: [
-                      Text(
-                        gymInfo.name,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+        height: 235,
+        width: 208,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final imageHeight = constraints.maxHeight * 0.65;
+
+            return Card(
+              //clipBehavior: Clip.none,
+              elevation: 4,
+             // margin: EdgeInsets.only(bottom: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                    child: Image.asset(
+                      gymInfo.imageUrl,
+                      width: double.infinity,
+                      height: imageHeight,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[300],
+                        height: imageHeight,
+                        child: const Center(
+                          child: Icon(Icons.image_not_supported),
                         ),
                       ),
-                      SizedBox(height: 0),
-                      Text(
-                        gymInfo.location,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xff7f7f7f),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Text.rich(
-                            TextSpan(
-                              text: NumberFormat("#,###").format(gymInfo.sports.values.first),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                                color: Color(0xff7f7f7f),
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: ' 원',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 70),
-                            child: DefaultTextStyle(
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xff7f7f7f),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [Text(gymInfo.isPaid?"유료":"무료"), Text(gymInfo.isMembership?"회원제":"비회원제")],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 0),
-              ],
-            ),
-          ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          gymInfo.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            height: 1.3,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                       // const SizedBox(height: 1),
+                        Text(
+                          gymInfo.location,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            height: 0.9,
+                            color: Color(0xff7f7f7f),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+
+                          children: [
+                            Text(gymInfo.facilityHours),
+                            Spacer(),
+                            TagWidget.normal(gymInfo.isPaid ? "유료" : "무료", height: 17, width: 28, fontSize: 11),
+                            SizedBox(width: 5),
+                            TagWidget.bright(gymInfo.isMembership ? "회원제" : "비회원제", height: 17, width: 40, fontSize: 11),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

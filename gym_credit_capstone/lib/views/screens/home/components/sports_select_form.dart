@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../unsorted/selected_sports_list.dart'; // 선택한 스포츠를 보여줄 페이지 import
-/*import 'package:provider/provider.dart';
-import 'package:gym_credit_capstone/view_models/filtered_gym_view_model.dart';*/
 
 class SportsSelectForm extends StatefulWidget {
   @override
@@ -99,7 +97,7 @@ class _SportsSelectionFormState extends State<SportsSelectForm> {
 
         // 아이콘 버튼 리스트
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50), // 좌우 여백 28 추가
+          padding: const EdgeInsets.symmetric(horizontal: 50), // 좌우 여백 50 추가
           child: GridView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(), // 부모 스크롤 사용
@@ -107,7 +105,7 @@ class _SportsSelectionFormState extends State<SportsSelectForm> {
               crossAxisCount: 4, // 한 줄에 4개씩
               crossAxisSpacing: 30,
               mainAxisSpacing: 40,
-              childAspectRatio: 1, // 정사각형 비율 유지
+              childAspectRatio: 0.8, // 텍스트를 위한 공간 확보를 위해 비율 조정
             ),
             itemCount: sports.length,
             itemBuilder: (context, index) {
@@ -117,30 +115,43 @@ class _SportsSelectionFormState extends State<SportsSelectForm> {
 
               return GestureDetector(
                 onTap: () => _toggleSelection(name),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isSelected ? Color(0xff69b7ff) : Color(0xffF3F5F7),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      if (isSelected)
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.5),
-                          blurRadius: 5,
-                          spreadRadius: 2,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isSelected ? Color(0xff69b7ff) : Color(0xffF3F5F7),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            if (isSelected)
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.5),
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                              ),
+                          ],
                         ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        icon,
-                        size: 35,
-                        color: isSelected ? Colors.white : Color(0xffB1B3B5),
+                        child: Center(
+                          child: Icon(
+                            icon,
+                            size: 35,
+                            color: isSelected ? Colors.white : Color(0xffB1B3B5),
+                          ),
+                        ),
                       ),
-                      // 아이콘과 텍스트 간격 조정
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 5), // 아이콘과 텍스트 사이 간격
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Color(0xff69b7ff) : Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               );
             },
@@ -150,53 +161,3 @@ class _SportsSelectionFormState extends State<SportsSelectForm> {
     );
   }
 }
-
-/*import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:gym_credit_capstone/view_models/filtered_gym_view_model.dart'; // 선택한 스포츠를 보여줄 페이지 import
-
-class SportsSelectForm extends StatefulWidget {
-  const SportsSelectForm({super.key});
-
-  @override
-  _SportsSelectFormState createState() => _SportsSelectFormState();
-}
-
-class _SportsSelectFormState extends State<SportsSelectForm> {
-  List<String> selectedSports = []; // 선택된 종목 목록
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("스포츠 선택")),
-      body: ListView(
-        children: ["축구", "농구", "배드민턴", "탁구", "헬스장"].map((sport) {
-          return CheckboxListTile(
-            title: Text(sport),
-            value: selectedSports.contains(sport),
-            onChanged: (bool? value) {
-              setState(() {
-                if (value == true) {
-                  selectedSports.add(sport);
-                } else {
-                  selectedSports.remove(sport);
-                }
-              });
-            },
-          );
-        }).toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // 선택한 종목 데이터를 ViewModel로 전달
-          await Provider.of<FilteredGymViewModel>(context, listen: false)
-              .filterGymsBySports(selectedSports);
-
-          // 필터링 결과 화면으로 이동
-          Navigator.pushNamed(context, '/selectedSportsList');
-        },
-        child: Icon(Icons.arrow_forward),
-      ),
-    );
-  }
-}*/

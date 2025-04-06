@@ -14,7 +14,7 @@ import 'views/screens/profile/delete_account_screen.dart';
 import 'views/screens/qrcode/qrcode_page.dart';
 import 'views/screens/schedule/schedule_page.dart';
 
-import 'views/screens/unsorted/gym_info_page.dart';
+import 'views/screens/gym_detail/gym_detail_page.dart';
 
 class AppRoutes {
   static const String login = '/login';

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../unsorted/selected_sports_list.dart'; // 선택한 스포츠를 보여줄 페이지 import
-/*import 'package:provider/provider.dart';
-import 'package:gym_credit_capstone/view_models/filtered_gym_view_model.dart';*/
 
 class SportsSelectForm extends StatefulWidget {
   @override
@@ -150,53 +148,3 @@ class _SportsSelectionFormState extends State<SportsSelectForm> {
     );
   }
 }
-
-/*import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:gym_credit_capstone/view_models/filtered_gym_view_model.dart'; // 선택한 스포츠를 보여줄 페이지 import
-
-class SportsSelectForm extends StatefulWidget {
-  const SportsSelectForm({super.key});
-
-  @override
-  _SportsSelectFormState createState() => _SportsSelectFormState();
-}
-
-class _SportsSelectFormState extends State<SportsSelectForm> {
-  List<String> selectedSports = []; // 선택된 종목 목록
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("스포츠 선택")),
-      body: ListView(
-        children: ["축구", "농구", "배드민턴", "탁구", "헬스장"].map((sport) {
-          return CheckboxListTile(
-            title: Text(sport),
-            value: selectedSports.contains(sport),
-            onChanged: (bool? value) {
-              setState(() {
-                if (value == true) {
-                  selectedSports.add(sport);
-                } else {
-                  selectedSports.remove(sport);
-                }
-              });
-            },
-          );
-        }).toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // 선택한 종목 데이터를 ViewModel로 전달
-          await Provider.of<FilteredGymViewModel>(context, listen: false)
-              .filterGymsBySports(selectedSports);
-
-          // 필터링 결과 화면으로 이동
-          Navigator.pushNamed(context, '/selectedSportsList');
-        },
-        child: Icon(Icons.arrow_forward),
-      ),
-    );
-  }
-}*/

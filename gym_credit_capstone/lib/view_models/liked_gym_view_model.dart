@@ -9,46 +9,6 @@ class LikedGymViewModel extends ChangeNotifier {
 
   List<GymInfo> _likedGyms = [];
   bool _isLoading = false;
-  String? _errorMessage;
-
-  List<GymInfo> get likedGyms => _likedGyms;
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-
-  GymInfo getGymInfoByIndex(int index) {
-    if (index < 0 || index >= _likedGyms.length) {
-      throw IndexError(index, _likedGyms);
-    }
-    return _likedGyms[index];
-  }
-
-  LikedGymViewModel({
-    required UserRepository userRepository,
-    required GymInfoRepository gymInfoRepository,
-  })  : _userRepository = userRepository,
-        _gymInfoRepository = gymInfoRepository;
-
-  Future<void> fetchLikedGyms() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      _likedGyms = await _gymInfoRepository.fetchLikedGyms(_userRepository);
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-}
-
-//수정 전 코드 ====>
-
-/*class LikedGymViewModel extends ChangeNotifier {
-  final UserRepository _userRepository;
-  final GymInfoRepository _gymInfoRepository;
-
-  List<GymInfo> _likedGyms = [];
-  bool _isLoading = false;
 
   List<GymInfo> get likedGyms => _likedGyms;
   bool get isLoading => _isLoading;
@@ -74,4 +34,6 @@ class LikedGymViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-}*/
+
+
+}

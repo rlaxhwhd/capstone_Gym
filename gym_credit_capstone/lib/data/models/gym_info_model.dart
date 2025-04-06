@@ -30,7 +30,7 @@ class GymInfo {
     return GymInfo(
       name: id,
       location: map['도로명'] ?? '',
-      imageUrl: map['imageUrl'] ?? 'assets/tennis.png',
+      imageUrl: 'assets/images/gyms/$id.png',
       facilityHours: map['운영시간'] ?? '정보 없음',
       tel: map['전화번호'] ?? '정보 없음',
       coord: map['위치'] != null ? map['위치'] as GeoPoint : GeoPoint(0, 0), // 좌표 변환

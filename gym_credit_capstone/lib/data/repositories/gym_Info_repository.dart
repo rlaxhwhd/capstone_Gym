@@ -5,6 +5,28 @@ class GymInfoRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collectionPath = 'Gym_list'; // 체육관 정보를 저장한 Firestore 컬렉션 이름
 
+  Future<List<GymInfo>> getGymsBySports(List<String> selectedSports) async {
+    try {
+      // 전체 체육관 불러오기
+      final gymsSnapshot = await _firestore.collection(_collectionPath).get();
+
+      final gyms = gymsSnapshot.docs
+          .map((doc) => GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          .toList();
+
+      // 선택된 모든 종목을 포함한 체육관만 필터링 (AND 조건)
+      final filteredGyms = gyms.where((gym) {
+        return selectedSports.every((sport) => gym.sports.containsKey(sport));
+      }).toList();
+
+      return filteredGyms;
+    } catch (e) {
+      print("Error fetching gyms by sports: $e");
+      return [];
+    }
+  }
+
+
   //id목록으로 체육관 정보들 불러오기
   Future<List<GymInfo>> getGymsByIds(List<String> gymIds) async {
     try {

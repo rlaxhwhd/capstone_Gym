@@ -32,6 +32,7 @@ dependencies:
   provider: ^6.0.5
   flutter:
     sdk: flutter
+  flutter_svg: ^1.1.6
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -43,6 +44,13 @@ dependencies:
   intl: ^0.20.2
   url_launcher: ^6.0.9
   url_launcher_web: ^2.4.0
+  location: ^5.0.0
+  latlong2: ^0.9.1
+  flutter_naver_map:
+    git:
+      url: https://github.com/note11g/flutter_naver_map.git
+      ref: main
+
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +80,9 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/
+    - assets/images/
+    - assets/images/gyms/
+    - assets/text/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

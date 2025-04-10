@@ -1,21 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/gym_info_model.dart';
-import 'user_repository.dart';
 
 class GymInfoRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collectionPath = 'Gym_list'; // 체육관 정보를 저장한 Firestore 컬렉션 이름
 
-  Future<List<GymInfo>> fetchLikedGyms(UserRepository userRepository) async {
+  Future<List<GymInfo>> getGymsBySports(List<String> selectedSports) async {
     try {
-      List<String> likedGymIds = await userRepository.getLikedGymIds();
-      if (likedGymIds.isEmpty) return [];
-      return await getGymsByIds(likedGymIds);
+      // 전체 체육관 불러오기
+      final gymsSnapshot = await _firestore.collection(_collectionPath).get();
+
+      final gyms = gymsSnapshot.docs
+          .map((doc) => GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          .toList();
+
+      // 선택된 모든 종목을 포함한 체육관만 필터링 (AND 조건)
+      final filteredGyms = gyms.where((gym) {
+        return selectedSports.every((sport) => gym.sports.containsKey(sport));
+      }).toList();
+
+      return filteredGyms;
     } catch (e) {
-      print("Error fetching liked gyms: $e");
+      print("Error fetching gyms by sports: $e");
       return [];
     }
   }
+
 
   //id목록으로 체육관 정보들 불러오기
   Future<List<GymInfo>> getGymsByIds(List<String> gymIds) async {
@@ -23,16 +33,16 @@ class GymInfoRepository {
       if (gymIds.isEmpty) return [];
 
       QuerySnapshot querySnapshot =
-      await _firestore
-          .collection(_collectionPath)
-          .where(FieldPath.documentId, whereIn: gymIds)
-          .get();
+          await _firestore
+              .collection(_collectionPath)
+              .where(FieldPath.documentId, whereIn: gymIds)
+              .get();
 
       return querySnapshot.docs
           .map(
             (doc) =>
-            GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id),
-      )
+                GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id),
+          )
           .toList();
     } catch (e) {
       print("Error fetching gyms by IDs: $e");
@@ -44,7 +54,7 @@ class GymInfoRepository {
   Future<GymInfo?> getGymById(String gymId) async {
     try {
       DocumentSnapshot doc =
-      await _firestore.collection(_collectionPath).doc(gymId).get();
+          await _firestore.collection(_collectionPath).doc(gymId).get();
 
       if (doc.exists) {
         return GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id);
@@ -60,13 +70,13 @@ class GymInfoRepository {
   Future<List<GymInfo>> getAllGyms() async {
     try {
       QuerySnapshot querySnapshot =
-      await _firestore.collection(_collectionPath).get();
+          await _firestore.collection(_collectionPath).get();
 
       return querySnapshot.docs
           .map(
             (doc) =>
-            GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id),
-      )
+                GymInfo.fromMap(doc.data() as Map<String, dynamic>, doc.id),
+          )
           .toList();
     } catch (e) {
       print("Error fetching all gyms: $e");

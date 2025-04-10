@@ -14,7 +14,10 @@ import 'views/screens/profile/delete_account_screen.dart';
 import 'views/screens/qrcode/qrcode_page.dart';
 import 'views/screens/schedule/schedule_page.dart';
 
-import 'views/screens/unsorted/gym_info_page.dart';
+import 'views/screens/gym_detail/gym_detail_page.dart';
+
+// ✅ 새로 추가
+import 'package:gym_credit_capstone/views/screens/unsorted/selected_sports_list.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -28,6 +31,9 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String qrcode = '/qrcode';
   static const String schedule = '/schedule';
+
+  // ✅ 새 route 추가
+  static const String selectedSportsList = '/selected_sports_list';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -51,9 +57,15 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SchedulePage());
       case logOut:
         return MaterialPageRoute(builder: (_) => const DeleteAccountScreen());
+      case selectedSportsList:
+        final args = settings.arguments as List<String>;
+        return MaterialPageRoute(
+          builder: (_) => SelectedSportsList(selectedSports: args),
+        );
       default:
         return MaterialPageRoute(
-            builder: (_) => const Scaffold(body: Center(child: Text('404 Not Found'))));
+          builder: (_) => const Scaffold(body: Center(child: Text('404 Not Found'))),
+        );
     }
   }
 }

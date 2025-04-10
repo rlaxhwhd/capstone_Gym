@@ -9,15 +9,15 @@ class UserRepository {
 
   // 생성자에서 AuthRepository를 직접 주입하도록 변경
   UserRepository({AuthRepository? authRepository})
-      : _authRepository = authRepository ?? AuthRepository();
+    : _authRepository = authRepository ?? AuthRepository();
 
   Future<bool> checkUserExists(String email) async {
     try {
       final querySnapshot =
-      await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email.trim())
-          .get();
+          await _firestore
+              .collection('users')
+              .where('email', isEqualTo: email.trim())
+              .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
@@ -29,10 +29,10 @@ class UserRepository {
   Future<UserModel?> getUserByEmail(String email) async {
     try {
       final querySnapshot =
-      await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email.trim())
-          .get();
+          await _firestore
+              .collection('users')
+              .where('email', isEqualTo: email.trim())
+              .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         return UserModel.fromFirestore(querySnapshot.docs.first.data());
@@ -54,7 +54,7 @@ class UserRepository {
 
     try {
       DocumentSnapshot userDoc =
-      await _firestore.collection('users').doc(userId).get();
+          await _firestore.collection('users').doc(userId).get();
       if (userDoc.exists && userDoc.data() != null) {
         var data = userDoc.data() as Map<String, dynamic>;
         return List<String>.from(data['favorite'] ?? []);
@@ -66,4 +66,43 @@ class UserRepository {
       return [];
     }
   }
+
+
+  // 찜버튼 함수
+  Future<void> toggleLikedGym(String gymName, {String? userId}) async {
+    userId ??= _authRepository.getCurrentUserId();
+
+    if (userId == null) {
+      print("Error: userId is null");
+      return;
+    }
+
+    try {
+      final userRef = _firestore.collection('users').doc(userId);
+      final userDoc = await userRef.get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        final List<String> likedGyms = List<String>.from(data['favorite'] ?? []);
+
+        if (likedGyms.contains(gymName)) {
+          // 이미 좋아요 되어 있으면 제거
+          await userRef.update({
+            'favorite': FieldValue.arrayRemove([gymName])
+          });
+        } else {
+          // 좋아요 안되어 있으면 추가
+          await userRef.update({
+            'favorite': FieldValue.arrayUnion([gymName])
+          });
+        }
+      }
+    } catch (e) {
+      print("Error toggling liked gym: $e");
+    }
+  }
+
+
+
+
 }

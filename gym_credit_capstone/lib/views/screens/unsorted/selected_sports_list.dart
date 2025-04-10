@@ -1,121 +1,287 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../screens/unsorted/gym_info_page.dart';
+import 'package:provider/provider.dart';
+import 'package:gym_credit_capstone/view_models/selected_sports_list_view_model.dart';
+import 'package:gym_credit_capstone/views/screens/gym_detail/gym_detail_page.dart';
+import 'package:gym_credit_capstone/views/common_widgets/custom_back_button.dart';
 
 class SelectedSportsList extends StatefulWidget {
   final List<String> selectedSports;
 
-  SelectedSportsList({Key? key, required this.selectedSports}) : super(key: key);
+  const SelectedSportsList({Key? key, required this.selectedSports}) : super(key: key);
 
   @override
-  _SelectedSportsListState createState() => _SelectedSportsListState();
+  State<SelectedSportsList> createState() => _SelectedSportsListState();
 }
 
-class _SelectedSportsListState extends State<SelectedSportsList> {
-  String? selectedOption = null; // 기본 필터를 "해당 없음"으로 설정
-  String filterText = "해당 없음"; // 버튼 텍스트의 기본값
 
-  // 옵션을 선택할 때 실행
-  void onOptionSelected(String? option) {
-    setState(() {
-      selectedOption = option;
-      filterText = option ?? "해당 없음"; // 옵션 선택에 따라 텍스트 변경
+class _SelectedSportsListState extends State<SelectedSportsList> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SelectedSportsListViewModel>().fetchGymList(widget.selectedSports);
     });
-    print("선택된 필터 옵션: ${selectedOption ?? "해당 없음"}");
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("선택한 스포츠")),
-      body: Column(
-        children: [
-          // 상단에 하나의 버튼 추가
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: ElevatedButton(
-              onPressed: () async {
-                final option = await showModalBottomSheet<String>(
-                  context: context,
-                  builder: (context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: Text("무료"),
-                          onTap: () => Navigator.pop(context, "무료"),
+      body: Consumer<SelectedSportsListViewModel>(
+        builder: (context, viewModel, _) {
+          final gyms = viewModel.filteredGyms;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: screenWidth * 0.07,
+                top: screenHeight * 0.05,
+                child: const CustomBackButton(),
+              ),
+              Positioned(
+                left: screenWidth * 0.07,
+                top: screenHeight * 0.18,
+                child: const Text(
+                  '보유한 체육관',
+                  style: TextStyle(
+                    color: Color(0xFF191919),
+                    fontSize: 20,
+                    fontFamily: 'NanumSquare',
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: screenWidth * 0.07,
+                top: screenHeight * 0.24,
+                right: screenWidth * 0.07,
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: widget.selectedSports.map((sport) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE6F3FF),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Text(
+                        sport,
+                        style: TextStyle(
+                          color: const Color(0xFF69B7FF),
+                          fontSize: screenWidth * 0.032,
+                          fontFamily: 'NanumSquare',
+                          fontWeight: FontWeight.w800,
                         ),
-                        ListTile(
-                          title: Text("유료"),
-                          onTap: () => Navigator.pop(context, "유료"),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Positioned(
+                right: screenWidth * 0.07,
+                top: screenHeight * 0.29,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        viewModel.toggleFreeFilter();
+                      },
+                      child: Text(
+                        '무료',
+                        style: TextStyle(
+                          color: viewModel.isFreeSelected ? Colors.blue : const Color(0xFFA6A6A6),
+                          fontSize: 14,
+                          fontFamily: 'NanumSquare',
+                          fontWeight: FontWeight.w800,
                         ),
-                        ListTile(
-                          title: Text("해당 없음"),
-                          onTap: () => Navigator.pop(context, null),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        viewModel.toggleReservableFilter();
+                      },
+                      child: Text(
+                        '예약가능',
+                        style: TextStyle(
+                          color: viewModel.isReservableSelected ? Colors.blue : const Color(0xFFA6A6A6),
+                          fontSize: 14,
+                          fontFamily: 'NanumSquare',
+                          fontWeight: FontWeight.w800,
                         ),
-                      ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: screenWidth * 0.07,
+                top: screenHeight * 0.35,
+                right: screenWidth * 0.07,
+                bottom: 0,
+                child: gyms.isEmpty
+                    ? const Center(
+                  child: Text(
+                    '해당 조건의 체육관이 없습니다.',
+                    style: TextStyle(
+                      color: Color(0xFF191919),
+                      fontSize: 16,
+                      fontFamily: 'NanumSquare',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  itemCount: gyms.length,
+                  itemBuilder: (context, index) {
+                    final gym = gyms[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GymDetailPage(gymName: gym.name),
+                          ),
+                        );
+                      },
+                      child: GymListItem(
+                        name: gym.name,
+                        address: gym.location,
+                        distance: "현 위치로부터 계산 중",
+                        isPaid: gym.isPaid,
+                        isReservable: true,
+                        imageUrl: gym.imageUrl,
+                      ),
                     );
                   },
-                );
-                onOptionSelected(option);
-              },
-              child: Text("무료/유료: $filterText"), // 초기 텍스트는 "해당 없음"
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// 체육관 리스트 아이템 위젯 (변경 없음)
+class GymListItem extends StatelessWidget {
+  final String name;
+  final String address;
+  final String distance;
+  final bool isPaid;
+  final bool isReservable;
+  final String imageUrl;
+
+  const GymListItem({
+    Key? key,
+    required this.name,
+    required this.address,
+    required this.distance,
+    required this.isPaid,
+    required this.isReservable,
+    required this.imageUrl,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 145,
+              height: 93,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                image: DecorationImage(
+                  image: AssetImage(imageUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-          ),
-          // StreamBuilder로 체육관 리스트 표시
-          Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('Gym_list').snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                final docs = snapshot.data!.docs;
-
-                // 필터링된 체육관 리스트
-                final filteredDocs = docs.where((doc) {
-                  final bool? isPaid = doc['유료']; // '유료' 필드 기반 필터링
-                  if (selectedOption == "무료") {
-                    return isPaid == false;
-                  } else if (selectedOption == "유료") {
-                    return isPaid == true;
-                  }
-                  return true; // "해당 없음"인 경우 모두 포함
-                }).toList();
-
-                return ListView.builder(
-                  itemCount: filteredDocs.length,
-                  itemBuilder: (context, index) {
-                    final doc = filteredDocs[index];
-
-                    if (doc.exists) {
-                      final String gymName = doc.id;
-
-                      return ListTile(
-                        title: Text(gymName),
-                        subtitle: Text("요금: ${doc['유료'] == true ? '유료' : '무료'}"),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => GymInfoPage(
-                                roadName: doc['도로명'] ?? "정보 없음",
-                                gymName: gymName,
-                                openTime: doc['운영시간'] ?? "정보 없음",
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                    return Container();
-                  },
-                );
-              },
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$name\n',
+                          style: const TextStyle(
+                            color: Color(0xFF191919),
+                            fontSize: 14,
+                            fontFamily: 'NanumSquare',
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '$address\n$distance',
+                          style: const TextStyle(
+                            color: Color(0xFF191919),
+                            fontSize: 14,
+                            fontFamily: 'NanumSquare',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        width: 43,
+                        height: 23,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF69B7FF),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          isPaid ? '유료' : '무료',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontFamily: 'NanumSquare',
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 62,
+                        height: 23,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE6F3FF),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          '예약가능',
+                          style: TextStyle(
+                            color: Color(0xFF69B7FF),
+                            fontSize: 12,
+                            fontFamily: 'NanumSquare',
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

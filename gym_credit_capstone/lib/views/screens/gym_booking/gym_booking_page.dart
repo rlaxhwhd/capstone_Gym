@@ -47,10 +47,15 @@ class _GymBookingPageState extends State<GymBookingPage> {
     final endTime = int.parse(times[1].split(':')[0]); // 종료 시간
 
     List<String> timeSlots = [];
+    final now = DateTime.now();
+
     for (int i = startTime; i <= endTime; i++) {
-      String time = i.toString().padLeft(2, '0') + ':00';
-      if (time != '12:00') { // 12:00은 제외
-        timeSlots.add(time);
+      DateTime slotTime = DateTime(now.year, now.month, now.day, i);
+      if (slotTime.isAfter(now)) { // 현재 시간 이후인지 확인
+        String time = i.toString().padLeft(2, '0') + ':00';
+        if (time != '12:00') { // 12:00은 제외
+          timeSlots.add(time);
+        }
       }
     }
     return timeSlots;
@@ -58,24 +63,19 @@ class _GymBookingPageState extends State<GymBookingPage> {
 
   Future<void> saveReservationToFirestore() async {
     try {
-      // 현재 시간 가져오기
-      final currentTime = DateTime.now();
-
-      // AM/PM 대신 정확히 24시간 형식으로 변환
       final nowInUTCPlus9 = DateTime.now().toUtc().add(Duration(hours: 9));
       final formattedCreateTime = DateFormat('yyyy년 M월 d일 HH시 mm분 ss초').format(nowInUTCPlus9) + " UTC+9";
       final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
 
-      // Firestore에 저장할 데이터 생성
       CollectionReference reservations = FirebaseFirestore.instance.collection('reservations');
       await reservations.add({
-        'createtime': formattedCreateTime, // 현재 시간을 포맷하여 저장
-        'date': formattedDate, // 선택된 날짜 포맷 저장
+        'createtime': formattedCreateTime,
+        'date': formattedDate,
         'gymid': widget.gymId,
         'sports': {'sportname': 1500},
         'status': true,
-        'time': selectedTime, // 선택된 시간 저장
-        'userid': userId, // 현재 로그인된 사용자 ID 저장
+        'time': selectedTime,
+        'userid': userId,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,7 +93,6 @@ class _GymBookingPageState extends State<GymBookingPage> {
   Widget build(BuildContext context) {
     DateTime today = DateTime.now();
 
-    // 오늘부터 6일 뒤까지의 날짜만 필터링
     List<DateTime> availableDates = List.generate(
       7,
           (index) => today.add(Duration(days: index)),
@@ -124,7 +123,7 @@ class _GymBookingPageState extends State<GymBookingPage> {
                   return ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        selectedDate = date; // 선택된 날짜 저장
+                        selectedDate = date;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -133,7 +132,7 @@ class _GymBookingPageState extends State<GymBookingPage> {
                         ),
                       );
                     },
-                    child: Text(DateFormat('d일').format(date)), // 일(day)만 표시
+                    child: Text(DateFormat('d일').format(date)),
                   );
                 }).toList(),
               ),
@@ -146,15 +145,25 @@ class _GymBookingPageState extends State<GymBookingPage> {
                 spacing: 8.0,
                 runSpacing: 8.0,
                 children: availableTimes.map((time) {
+                  DateTime selectedSlotTime = DateTime(
+                    selectedDate.year,
+                    selectedDate.month,
+                    selectedDate.day,
+                    int.parse(time.split(':')[0]),
+                  );
+                  bool isPastTime = selectedSlotTime.isBefore(DateTime.now());
+
                   return ElevatedButton(
-                    onPressed: () {
+                    onPressed: !isPastTime
+                        ? () {
                       setState(() {
-                        selectedTime = time; // 선택된 시간 저장
+                        selectedTime = time;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("선택된 시간: $selectedTime")),
                       );
-                    },
+                    }
+                        : null,
                     child: Text(time),
                   );
                 }).toList(),

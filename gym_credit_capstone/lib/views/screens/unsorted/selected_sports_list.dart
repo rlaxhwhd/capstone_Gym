@@ -13,7 +13,6 @@ class SelectedSportsList extends StatefulWidget {
   State<SelectedSportsList> createState() => _SelectedSportsListState();
 }
 
-
 class _SelectedSportsListState extends State<SelectedSportsList> {
   @override
   void initState() {
@@ -143,7 +142,10 @@ class _SelectedSportsListState extends State<SelectedSportsList> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => GymDetailPage(gymName: gym.name),
+                            builder: (context) => GymDetailPage(
+                              gymName: gym.name, // 선택된 체육관 이름 전달
+                              selectedSports: widget.selectedSports, // 선택된 종목 리스트 전달
+                            ),
                           ),
                         );
                       },

@@ -12,8 +12,9 @@ import 'components/gym_booking_button.dart';
 
 class GymDetailPage extends StatelessWidget {
   final String gymName;
+  final List<String> selectedSports; // 선택된 종목 리스트 전달
 
-  const GymDetailPage({super.key, required this.gymName});
+  const GymDetailPage({super.key, required this.gymName, required this.selectedSports});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,10 @@ class GymDetailPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  GymBookingButton(gymId: gym.name,),
+                  GymBookingButton(
+                    gymId: gym.name,
+                    selectedSports: selectedSports, // 선택된 종목 리스트 전달
+                  ),
                 ],
               ),
             );

@@ -10,10 +10,23 @@ import 'components/home_events_card.dart';
 import 'components/sports_select_form.dart';
 import 'components/sliderWithIndicator.dart';
 import '../gym_detail/gym_detail_page.dart';
-import '../../../view_models/gym_detail_view_model.dart';
+//import '../../../view_models/gym_detail_view_model.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> selectedSports = []; // 사용자가 선택한 종목 저장
+
+  void _updateSelectedSports(List<String> sports) {
+    setState(() {
+      selectedSports = sports; // 사용자가 선택한 종목 업데이트
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +48,10 @@ class HomePage extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => BackgroundViewModel()),
         ChangeNotifierProvider(
-          create:
-              (_) => LikedGymViewModel(
-                userRepository: UserRepository(),
-                gymInfoRepository: GymInfoRepository(),
-              )..fetchLikedGyms(),
+          create: (_) => LikedGymViewModel(
+            userRepository: UserRepository(),
+            gymInfoRepository: GymInfoRepository(),
+          )..fetchLikedGyms(),
         ),
       ],
       child: Scaffold(
@@ -122,16 +134,14 @@ class HomePage extends StatelessWidget {
                                   padding: const EdgeInsets.only(right: 16),
                                   child: GestureDetector(
                                     onTap: () {
+                                      // 사용자가 선택한 종목 전달
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder:
-                                              (context) => GymDetailPage(
-                                                gymName:
-                                                    viewModel
-                                                        .likedGyms[index]
-                                                        .name,
-                                              ),
+                                          builder: (context) => GymDetailPage(
+                                            gymName: viewModel.likedGyms[index].name,
+                                            selectedSports: selectedSports, // 실제 선택된 종목 전달
+                                          ),
                                         ),
                                       );
                                     },
@@ -146,9 +156,8 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     SizedBox(height: 16),
-                    SportsSelectForm(),
+                    SportsSelectForm(), // 종목 선택 컴포넌트 추가
                     SizedBox(height: 16),
                     SliderWithIndicator(),
                   ],

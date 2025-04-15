@@ -88,6 +88,7 @@ Flutter와 Firebase를 기반으로 한 공공체육관 예약 앱입니다.
     ├── background_view_model.dart         // 배경 이미지 관련 상태 관리
     ├── delete_account_viewmodel.dart      // 계정 삭제 관련 상태 관리
     ├── find_password_viewmodel.dart       // 비밀번호 찾기 로직 처리
+    ├── gym_booking_view_model.dart        // 체육관 예약 프로세스를 관리
     ├── gym_detail_view_model.dart         // 체육관 상세 정보 관련 상태 관리
     ├── liked_gym_view_model.dart          // 즐겨찾기 기능 상태 관리
     ├── login_viewmodel.dart               // 로그인/로그아웃 상태 관리

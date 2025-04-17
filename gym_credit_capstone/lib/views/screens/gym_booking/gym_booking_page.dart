@@ -312,4 +312,5 @@ class _GymBookingPageState extends State<GymBookingPage> {
       },
     );
   }
+
 }

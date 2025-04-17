@@ -46,3 +46,4 @@ class SelectedSportsListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 }
+

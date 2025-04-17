@@ -52,4 +52,5 @@ class GymBookingButton extends StatelessWidget {
       ),
     );
   }
+
 }

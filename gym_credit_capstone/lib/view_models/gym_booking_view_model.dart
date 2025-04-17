@@ -201,4 +201,5 @@ class GymBookingViewModel extends ChangeNotifier {
       });
     }
   }
+
 }

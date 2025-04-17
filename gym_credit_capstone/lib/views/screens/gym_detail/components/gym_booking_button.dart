@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gym_credit_capstone/views/screens/gym_booking/gym_booking_page.dart';
+import 'package:gym_credit_capstone/views/screens/gym_booking/sports_select_page.dart';
 
 class GymBookingButton extends StatelessWidget {
   final String gymId;
-  final List<String> selectedSports; // 선택된 종목 리스트를 전달받는 필드 추가
 
-  const GymBookingButton({super.key, required this.gymId, required this.selectedSports});
+  const GymBookingButton({super.key, required this.gymId});
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +21,25 @@ class GymBookingButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(50),
           ),
         ),
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final selectedSport = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => GymBookingPage(
-                gymId: gymId,
-                selectedSports: selectedSports, // 선택된 종목 리스트 전달
-              ),
+              builder: (context) => SportsSelectionPage(gymId: gymId),
             ),
           );
+
+          if (selectedSport != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GymBookingPage(
+                  gymId: gymId,
+                  selectedSports: [selectedSport], // 🔹 선택한 종목 전달
+                ),
+              ),
+            );
+          }
         },
         child: const Text(
           '예약하기',

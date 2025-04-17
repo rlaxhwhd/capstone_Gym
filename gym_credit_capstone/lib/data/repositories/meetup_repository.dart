@@ -1,4 +1,3 @@
-// data/repositories/meetup_repository.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_credit_capstone/data/models/meetup_model.dart';
 

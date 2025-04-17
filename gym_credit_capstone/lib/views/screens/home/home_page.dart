@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gym_credit_capstone/data/repositories/gym_Info_repository.dart';
+import 'package:gym_credit_capstone/data/repositories/gym_info_repository.dart';
 import 'package:gym_credit_capstone/data/repositories/user_repository.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/background_view_model.dart';
@@ -10,7 +10,6 @@ import 'components/home_events_card.dart';
 import 'components/sports_select_form.dart';
 import 'components/sliderWithIndicator.dart';
 import '../gym_detail/gym_detail_page.dart';
-//import '../../../view_models/gym_detail_view_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -139,8 +138,7 @@ class _HomePageState extends State<HomePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => GymDetailPage(
-                                            gymName: viewModel.likedGyms[index].name,
-                                            selectedSports: selectedSports, // 실제 선택된 종목 전달
+                                            gymId: viewModel.likedGyms[index].name, // 선택된 체육관 ID 전달
                                           ),
                                         ),
                                       );

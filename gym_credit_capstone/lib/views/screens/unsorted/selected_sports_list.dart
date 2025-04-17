@@ -143,8 +143,7 @@ class _SelectedSportsListState extends State<SelectedSportsList> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => GymDetailPage(
-                              gymName: gym.name, // 선택된 체육관 이름 전달
-                              selectedSports: widget.selectedSports, // 선택된 종목 리스트 전달
+                              gymId: gym.name, // 선택된 체육관 ID 전달
                             ),
                           ),
                         );

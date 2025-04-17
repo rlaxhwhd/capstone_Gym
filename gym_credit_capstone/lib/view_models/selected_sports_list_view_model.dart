@@ -1,7 +1,6 @@
-// view_models/selected_sports_list_view_model.dart
 import 'package:flutter/foundation.dart';
 import 'package:gym_credit_capstone/data/models/gym_info_model.dart';
-import 'package:gym_credit_capstone/data/repositories/gym_Info_repository.dart';
+import 'package:gym_credit_capstone/data/repositories/gym_info_repository.dart';
 
 class SelectedSportsListViewModel extends ChangeNotifier {
   final GymInfoRepository gymInfoRepository;

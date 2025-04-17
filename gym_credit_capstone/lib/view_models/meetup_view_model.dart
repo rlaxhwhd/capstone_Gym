@@ -13,7 +13,7 @@ class MeetupViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  // 전체 모임 불러오기
+  // 모임 전체 불러오기 (필요 시)
   Future<void> fetchAllMeetups() async {
     _isLoading = true;
     notifyListeners();
@@ -32,7 +32,7 @@ class MeetupViewModel extends ChangeNotifier {
     required int capacity,
   }) async {
     final newMeetup = Meetup(
-      meetupId: '', // Firestore에서 생성 후 copyWith로 설정
+      meetupId: '', // Firestore에서 새 문서를 생성할 때 교체할 예정
       gymName: gymName,
       title: title,
       meetupTime: meetupTime,
@@ -41,9 +41,7 @@ class MeetupViewModel extends ChangeNotifier {
     );
 
     await _repository.createMeetup(newMeetup);
-
-    // 성공 후, 다시 목록을 불러오거나 (간단히) 직접 리스트에 추가
-    _meetups.add(newMeetup);
+    _meetups.add(newMeetup); // 필요 시 목록에 추가 (혹은 fetchAllMeetups() 호출)
     notifyListeners();
   }
 }

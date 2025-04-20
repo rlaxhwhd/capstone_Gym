@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GymBookingModel {
   final Map<String, String> sportsTranslation = {
@@ -13,7 +13,7 @@ class GymBookingModel {
     "골프장": "GLF"
   };
 
-  Future<void> saveReservationToFirestore(
+  /*Future<void> saveReservationToFirestore(
       String gymId, String gymAbbreviation, String userId, DateTime selectedDate, String selectedTime, String sportsSummary, int price) async {
     final formattedDate = "${selectedDate.toLocal()}".split(' ')[0];
     final formattedCreateTime = selectedDate.toLocal().toIso8601String();
@@ -33,7 +33,7 @@ class GymBookingModel {
       'time': selectedTime, // 선택한 시간
       'userid': userId, // 사용자 ID
     });
-  }
+  }*/
 
   String translateSportsSummary(String sportsSummary) {
     List<String> sportsList = sportsSummary.split(', ');

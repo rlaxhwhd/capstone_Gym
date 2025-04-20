@@ -37,11 +37,6 @@ class GymBookingViewModel extends ChangeNotifier {
     return availableTimes_list;
   }
 
-  void checkReservations(DateTime selectedDate) {
-    // 🔹 Firestore에서 해당 날짜의 예약 확인
-    print("[DEBUG] 예약 확인 실행: $selectedDate");
-  }
-
   void setCallCheckReservations(Function(DateTime) callback) {
     callCheckReservations = callback;
   }
@@ -137,72 +132,27 @@ class GymBookingViewModel extends ChangeNotifier {
     return "$year $month $day $period $hour시 $minute $second UTC+9";
   }
 
-  /*Future<void> saveReservation(String gymId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    /*if (user == null) {
-      print('사용자가 로그인하지 않았습니다.');
-      return;
-    }*/
-
-    try {
-      DocumentSnapshot? gymSnapshot = await FirebaseFirestore.instance.collection('Gym_list').doc(gymId).get();
-
-      if (gymSnapshot.exists) {
-        String translatedSportsName = _bookingModel.translateSportsSummary(sportsSummary);
-        String gymAbbreviation = gymSnapshot.get("약자");
-
-        // 현재 선택된 종목의 가격 가져오기
-        Map<String, dynamic> sportsData = gymSnapshot.get("종목");
-        int price = sportsData[sportsSummary] ?? 0; // 해당 종목이 없으면 기본값 0 설정
-
-        // 현재 시간 UTC+9로 변환 및 포맷 적용
-        String formattedCreateTime = formatDateTimeKST(DateTime.now());
-
-        // 예약 ID 생성 (고유값)
-        String formattedDocName = "${selectedDate.toString().substring(0, 10)}_${selectedTime}_${gymAbbreviation}_${translatedSportsName}_${user!.uid}";
-
-        // 🔹 Firestore에서 동일한 예약이 있는지 확인
-        DocumentReference reservationRef = FirebaseFirestore.instance.collection('reservations').doc(formattedDocName);
-        DocumentSnapshot reservationSnapshot = await reservationRef.get();
-
-        Map<String, dynamic> reservationData = {
-          "createtime": formattedCreateTime, // 생성 시간
-          "date": selectedDate!.toLocal().toString().split(' ')[0], // 날짜
-          "gymId": gymId, // 체육관 ID
-          "gymAbbreviation": gymAbbreviation, // 체육관 약어
-          "sports": {
-            "price": price, // 가격
-            "sportName": translatedSportsName, // 운동 종목
-          },
-          "status": true, // 상태
-          "time": selectedTime, // 선택 시간
-          "userId": user!.uid // 사용자 ID
-        };
-
-        if (reservationSnapshot.exists) {
-          // 🔹 이미 예약이 존재하면 업데이트
-          await reservationRef.update({
-            ...reservationData,
-            "updated_at": FieldValue.serverTimestamp(), // 업데이트 시간 추가
-          });
-          print("✅ 예약이 업데이트되었습니다: $formattedDocName");
-        } else {
-          // 🔹 예약이 존재하지 않으면 새로운 예약 생성
-          await reservationRef.set(reservationData);
-          print("✅ 새로운 예약이 생성되었습니다: $formattedDocName");
-        }
-      } else {
-        print('❌ 체육관 데이터를 찾을 수 없습니다.');
-      }
-    } catch (e) {
-      print('❌ 체육관 데이터를 불러오는 중 오류 발생: $e');
-    }
-  }*/
-
-  Future<void> saveReservation(String gymId) async {
+  //예약 정보 저장
+  Future<bool> saveReservation(
+      String gymId
+      , Map<String, List<String>> disabledTimes
+      , String selectedTime
+      , String formattedDate) async {
     final user = FirebaseAuth.instance.currentUser;
 
     DocumentSnapshot? gymSnapshot;
+
+    print("[DEBUG_VIEW_MODEL]" + disabledTimes.length.toString() + "_" + selectedTime);
+
+    for(int i = 0; i < disabledTimes.length; i++) {
+      if (disabledTimes.containsKey(formattedDate) && i < disabledTimes[formattedDate]!.length
+      && disabledTimes[formattedDate]![i] == selectedTime) {
+        print("[DEBUG_VIEW_MODEL_FOR] " + disabledTimes[formattedDate]![i] + "_" + selectedTime);
+
+        print("[DEBUG_VIEW_MODEL_FOR] 예약을 해선 안됨");
+        return false;
+      }
+    }
 
     try {
       gymSnapshot = await FirebaseFirestore.instance.collection('Gym_list').doc(gymId).get();
@@ -219,30 +169,37 @@ class GymBookingViewModel extends ChangeNotifier {
         // 현재 시간 UTC+9로 변환 및 포맷 적용
         String formattedCreateTime = formatDateTimeKST(DateTime.now());
 
+        // 날짜를 "YYYY-MM-DD" 형식으로 변환
+        String formattedDate = "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}";
+
         // 직접 데이터 항목 지정
         Map<String, dynamic> reservationData = {
           "createtime": formattedCreateTime, // 생성 시간
-          "date": selectedDate!.toLocal().toString().split(' ')[0], // 날짜
+          "date": formattedDate, // 날짜 (00:00:00.000 제거됨)
           "gymId": gymId, // 체육관 ID
           "gymAbbreviation": gymAbbreviation, // 체육관 약어
           "sports": {
             "price": price, // 가격
             "sportName": translatedSportsName, // 운동 종목
           },
-          "status": true, // 상태
+          "status": gymSnapshot.get('유료'), // 상태
           "time": selectedTime, // 선택 시간
           "userId": user!.uid // 사용자 ID
         };
 
         // 직접 지정한 항목을 Firestore에 저장
-        String formattedDocName = "${selectedDate.toString().substring(0, 10)}_${selectedTime}_${gymAbbreviation}_${translatedSportsName}_${user.uid}";
+        String formattedDocName = "${formattedDate}_${selectedTime}_${gymAbbreviation}_${translatedSportsName}_${user.uid}";
         await FirebaseFirestore.instance.collection('reservations').doc(formattedDocName).set(reservationData);
+
+        return true;
       } else {
         print('체육관 데이터를 찾을 수 없습니다.');
       }
     } catch (e) {
       print('체육관 데이터를 불러오는 중 오류 발생: $e');
     }
+
+    return false;
   }
 
   void updateSelectedTime(String time) {
@@ -263,5 +220,4 @@ class GymBookingViewModel extends ChangeNotifier {
       });
     }
   }
-
 }

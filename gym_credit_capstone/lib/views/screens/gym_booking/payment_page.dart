@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:gym_credit_capstone/views/common_widgets/custom_back_button.dart';
 import 'package:gym_credit_capstone/view_models/gym_booking_view_model.dart';
+import 'package:gym_credit_capstone/view_models/payment_view_model.dart';
 import 'package:gym_credit_capstone/data/repositories/gym_Info_repository.dart';
 import 'package:gym_credit_capstone/utils/date_calculator.dart';
-import 'package:gym_credit_capstone/view_models/payment_view_model.dart';
 
 class PaymentPage extends StatefulWidget {
   final String gymId;
@@ -107,19 +108,21 @@ class _PaymentPageState extends State<PaymentPage> {
     Color appBarColor = Colors.blue; // 버튼 색상 및 상단 색상으로 사용
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: backgroundColor, // 상단 색상을 배경과 동일하게
-        foregroundColor: Colors.black, // 상단 글자 색상 설정
-        elevation: 0, // 그림자 제거
-      ),
       body: Container(
-        margin: EdgeInsets.only(right: 16, left: 16),
+        padding: EdgeInsets.only(right: 16, left: 16),
         color: backgroundColor, // 전체 배경 색상
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 32),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 10,
+                left: 26,
+                child: CustomBackButton(),
+              ),
+              SizedBox(height: 24),
               Text('결제하기', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
               SizedBox(height: 16),
 

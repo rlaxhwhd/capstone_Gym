@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_credit_capstone/view_models/gym_booking_view_model.dart';
 import 'package:gym_credit_capstone/data/repositories/gym_info_repository.dart';
+import '../../screens/gym_booking/payment_page.dart';
 
 class GymBookingPage extends StatefulWidget {
   final String gymId;
@@ -16,11 +17,10 @@ class GymBookingPage extends StatefulWidget {
 
 class _GymBookingPageState extends State<GymBookingPage> {
   final GymInfoRepository _model = GymInfoRepository();
-  late GymBookingViewModel viewModel;
+  late GymBookingViewModel? viewModel;
   Map<String, int> reservationCounts = {}; // 🔹 특정 날짜의 예약 데이터를 저장
   String gymAbbreviation = "UnknownGym"; // 🔹 체육관 약자 저장
   String formattedDate = "0000-00-00";
-  bool isProcessing = false;
   bool isCheckingReservation = false; // 🔹 예약 확인 중일 때 시간 선택 버튼 비활성화
   Map<String, List<String>> disabledTimes = {}; // 🔹 날짜별 비활성화된 시간 저장
 
@@ -34,19 +34,19 @@ class _GymBookingPageState extends State<GymBookingPage> {
       Map<String, String> operatingHours = await fetchOperatingHours(widget.gymId);
 
       // 🔹 운영시간을 기반으로 예약 가능한 시간 생성
-      List<String> availableTimes = viewModel.generateAvailableTimes(
+      List<String> availableTimes = viewModel!.generateAvailableTimes(
           operatingHours["start"]!, operatingHours["end"]!
       );
 
-      viewModel.fetchNext7Days(); // 🔹 자동으로 오늘부터 7일 적용
+      viewModel!.fetchNext7Days(); // 🔹 자동으로 오늘부터 7일 적용
 
-      viewModel.setCallCheckReservations(checkReservations);
+      viewModel!.setCallCheckReservations(checkReservations);
 
       // 🔹 ViewModel에서 예약 가능한 시간을 운영시간을 반영하여 업데이트
-      viewModel.updateAvailableTimes(availableTimes);
+      viewModel!.updateAvailableTimes(availableTimes);
 
       // 🔹 종목 정보 업데이트
-      viewModel.calculateSportsSummary(widget.gymId, widget.selectedSports);
+      viewModel!.calculateSportsSummary(widget.gymId, widget.selectedSports);
 
       // 🔹 Firestore에서 체육관 약자 가져오기
       print("gymId: ${widget.gymId}");
@@ -70,7 +70,7 @@ class _GymBookingPageState extends State<GymBookingPage> {
     Map<String, String> operatingHours = await fetchOperatingHours(widget.gymId);
     String startTime = operatingHours["start"] ?? "00:00";
     String endTime = operatingHours["end"] ?? "23:59";
-    List<String> allowedTimes = viewModel.generateAvailableTimes(startTime, endTime);
+    List<String> allowedTimes = viewModel!.generateAvailableTimes(startTime, endTime);
 
     // 🔹 Firestore에서 예약된 문서 가져오기
     final QuerySnapshot querySnapshot = await firestore.collection('reservations').get();
@@ -237,28 +237,25 @@ class _GymBookingPageState extends State<GymBookingPage> {
                   // ✅ 예약 버튼
                   Center(
                     child: ElevatedButton(
-                      onPressed: (viewModel.selectedDate != null && viewModel.selectedTime.isNotEmpty && !isProcessing)
-                          ? () async {
-                        setState(() {
-                          isProcessing = true;
-                        });
+                      onPressed:
+                      viewModel.selectedDate != null
+                          ? () {
+                        formattedDate = "${viewModel.selectedDate!.toIso8601String().split('T')[0]}";
 
-                        bool isSuccessedToRes = await viewModel.saveReservation(widget.gymId, disabledTimes, viewModel.selectedTime, formattedDate);
-
-                        setState(() {
-                          isProcessing = false;
-                        });
-
-                        print("예약하는데 성공했는가? " + isSuccessedToRes.toString());
-
-                        if(isSuccessedToRes) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("예약이 완료되었습니다!")));
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("예약을 완료하지 못했습니다.")));
-                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PaymentPage(
+                              gymId: widget.gymId,
+                              formattedDate: formattedDate,
+                              selectedSport: viewModel.sportsSummary,
+                              disabledTimes: disabledTimes,
+                            ),
+                          ),
+                        );
                       }
                           : null,
-                      child: const Text("예약하기"),
+                      child: const Text("결제하기"),
                     ),
                   ),
                 ],

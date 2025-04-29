@@ -104,13 +104,13 @@ class GymBookingViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchGymData(String gymId) async {
+  /*Future<void> fetchGymData(String gymId) async {
     try {
       gymSnapshot = await FirebaseFirestore.instance.collection('Gym_list').doc(gymId).get();
     } catch (e) {
       print('체육관 데이터를 불러오는 중 오류 발생: $e');
     }
-  }
+  }*/
 
   String formatDateTimeKST(DateTime dateTime) {
     // UTC+9 시간대로 변환

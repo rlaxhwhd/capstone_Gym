@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_credit_capstone/view_models/gym_booking_view_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gym_credit_capstone/data/repositories/gym_Info_repository.dart';
+import 'package:gym_credit_capstone/utils/date_calculator.dart';
+import 'package:gym_credit_capstone/view_models/payment_view_model.dart';
 
 class PaymentPage extends StatefulWidget {
   final String gymId;
@@ -21,6 +23,9 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   GymBookingViewModel viewModel = GymBookingViewModel();
+  PaymentViewModel paymentViewModel = PaymentViewModel();
+  GymInfoRepository repository = GymInfoRepository();
+  DateCalculator dateUtils = DateCalculator();
 
   Map<String, dynamic>? data;
   String? selectedOption = '신용/체크카드';
@@ -34,79 +39,40 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
-    fetchCostValue(); // 비용 데이터 가져오기
-    fetchLocation(); // 도로명 데이터 가져오기
-  }
-
-  // 요일을 계산하는 함수 추가
-  String getDayOfWeek(String date) {
-    try {
-      // 날짜 문자열을 DateTime으로 변환
-      DateTime parsedDate = DateTime.parse(date);
-
-      // 요일 인덱스: 0 (일), 1 (월), ... 6 (토)
-      List<String> koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
-
-      // 요일 인덱스를 기반으로 한국어 요일 반환
-      return koreanDays[parsedDate.weekday % 7]; // `weekday`는 1부터 시작 (월=1, 일=7)
-    } catch (e) {
-      print('날짜 변환 오류: $e');
-      return ''; // 변환 오류 시 빈 문자열 반환
-    }
-  }
-
-  Future<Map<String, dynamic>?> getGymDataFromFirestore() async {
-    // Firestore instance 초기화
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Gym_list 컬렉션에서 gymName에 해당하는 문서 참조
-    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-    await firestore.collection('Gym_list').doc(widget.gymId).get();
-
-    // 문서 데이터 가져오기
-    return documentSnapshot.data();
+    fetchCostValue();
+    fetchLocation();
   }
 
   Future<void> fetchCostValue() async {
     try {
-      Map<String, dynamic>? data = await getGymDataFromFirestore();
-      if (data != null && data.containsKey('종목')) {
-        Map<String, dynamic> sports = data['종목'];
-        setState(() {
-          cost = sports[widget.selectedSport]; // 선택된 종목 값 가져오기
-          isLoadingCost = false; // 로드 완료 상태 변경
-        });
-      } else {
-        print('문서에 "종목" 필드가 없거나 데이터가 null입니다.');
-      }
+      int fetchedCost = await paymentViewModel.fetchCost(widget.gymId, widget.selectedSport);
+      setState(() {
+        cost = fetchedCost;
+        isLoadingCost = false;
+      });
     } catch (e) {
-      print('비용 데이터를 가져오는 중 에러 발생: $e');
+      print('Error fetching cost: $e');
     }
   }
 
   Future<void> fetchLocation() async {
     try {
-      Map<String, dynamic>? data = await getGymDataFromFirestore();
-      if (data != null && data.containsKey('도로명')) {
-        setState(() {
-          location = data['도로명']; // 도로명 데이터 가져오기
-          isLoadingLocation = false; // 로드 완료 상태 변경
-        });
-      } else {
-        print('문서에 "도로명" 필드가 없거나 데이터가 null입니다.');
-      }
+      String fetchedLocation = await paymentViewModel.fetchLocation(widget.gymId);
+      setState(() {
+        location = fetchedLocation;
+        isLoadingLocation = false;
+      });
     } catch (e) {
-      print('도로명 데이터를 가져오는 중 에러 발생: $e');
+      print('Error fetching location: $e');
     }
   }
 
-  // 별도 함수로 로직 분리
   Future<void> _processReservation() async {
     setState(() {
       isProcessing = true;
     });
 
-    bool isSuccessedToRes = await viewModel.saveReservation(
+    bool isSuccess = await viewModel.saveReservation(
       widget.gymId,
       widget.disabledTimes,
       viewModel.selectedTime,
@@ -117,19 +83,12 @@ class _PaymentPageState extends State<PaymentPage> {
       isProcessing = false;
     });
 
-    print("예약 성공 여부: $isSuccessedToRes");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(isSuccess ? "예약이 완료되었습니다!" : "예약을 완료하지 못했습니다.")),
+    );
 
-    if (isSuccessedToRes) {
-      // 이전 페이지로 돌아가기 (뒤로가기 개념)
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("예약이 완료되었습니다!")),
-      );
-      // 3번 뒤로가기
+    if (isSuccess) {
       popMultipleTimes(context, 3);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("예약을 완료하지 못했습니다.")),
-      );
     }
   }
 
@@ -142,7 +101,7 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   Widget build(BuildContext context) {
     viewModel = Provider.of<GymBookingViewModel>(context, listen: false);
-    String dayOfWeek = getDayOfWeek(widget.formattedDate);
+    String dayOfWeek = dateUtils.getDayOfWeek(widget.formattedDate);
 
     Color backgroundColor = Colors.white; // 아래 배경 색상 정의
     Color appBarColor = Colors.blue; // 버튼 색상 및 상단 색상으로 사용

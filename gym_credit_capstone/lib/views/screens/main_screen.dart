@@ -8,7 +8,6 @@ import 'meetup/meetup_page.dart';
 import 'qrcode/qrcode_page.dart';
 import 'package:flutter/services.dart';
 
-
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 

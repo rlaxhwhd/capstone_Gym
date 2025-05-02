@@ -182,7 +182,7 @@ class GymBookingViewModel extends ChangeNotifier {
             "price": price, // 가격
             "sportName": translatedSportsName, // 운동 종목
           },
-          "status": gymSnapshot.get('유료'), // 상태
+          "status": true, // 상태
           "time": selectedTime, // 선택 시간
           "userId": user!.uid // 사용자 ID
         };

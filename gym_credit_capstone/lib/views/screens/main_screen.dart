@@ -7,6 +7,7 @@ import 'profile/profile_page.dart';
 import 'meetup/meetup_page.dart';
 import 'qrcode/qrcode_page.dart';
 import 'package:flutter/services.dart';
+//import 'package:gym_credit_capstone/views/screens/schedule/schedule_page.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -21,9 +22,9 @@ class MainScreen extends StatelessWidget {
           return Scaffold(
             body: IndexedStack(
               index: viewModel.currentIndex, // 현재 선택된 탭 인덱스
-              children: const [
+              children: [
                 HomePage(),
-                SchedulePage(),
+                SchedulePage(), // 여기서 userId 전달
                 QrcodePage(),
                 MeetupPage(),
                 ProfilePage(),

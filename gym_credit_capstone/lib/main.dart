@@ -8,6 +8,8 @@ import 'view_models/liked_gym_view_model.dart';
 import 'view_models/delete_account_viewmodel.dart';
 import 'view_models/selected_sports_list_view_model.dart';
 import 'view_models/gym_booking_view_model.dart'; // GymBookingViewModel 추가
+import 'view_models/schedule_view_model.dart'; // GymBookingViewModel 추가
+import 'view_models/main_view_model.dart'; // GymBookingViewModel 추가
 
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/user_repository.dart';
@@ -39,6 +41,8 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => GymBookingViewModel(), // GymBookingViewModel 추가
         ),
+        ChangeNotifierProvider(create: (_) => MainViewModel()),
+        ChangeNotifierProvider(create: (_) => ScheduleViewModel()),
       ],
       child: const MyApp(),
     ),

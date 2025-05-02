@@ -54,7 +54,12 @@ class AppRoutes {
       case qrcode:
         return MaterialPageRoute(builder: (_) => const QrcodePage());
       case schedule:
-        return MaterialPageRoute(builder: (_) => const SchedulePage());
+        final userId = settings.arguments as String?; // arguments로 userId 가져오기
+        if (userId != null) {
+          return MaterialPageRoute(builder: (_) => SchedulePage());
+        } else {
+          return MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('User ID 없음'))));
+        }
       case logOut:
         return MaterialPageRoute(builder: (_) => const DeleteAccountScreen());
       case selectedSportsList:

@@ -202,13 +202,11 @@ class SchedulePage extends StatelessWidget {
                                   const SizedBox(width: 10), // 🔥 실선과 버튼 사이 간격 조정
                                   ElevatedButton(
                                     onPressed: reservation.status
-                                        ? () {
-                                      viewModel.cancelReservation(context, reservation.docId); // 🔥 취소 후 알림 표시
-                                    }
-                                        : null, // 🔥 status가 false면 버튼 비활성화
+                                        ? () => viewModel.showCancelDialog(context, reservation.docId, reservation.time) // 🔥 예약 취소 확인 다이얼로그 실행
+                                        : null,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
-                                      shadowColor: reservation.status ? Colors.transparent : Colors.grey, // 🔥 활성화 상태에서는 그림자 제거
+                                      shadowColor: reservation.status ? Colors.transparent : Colors.grey,
                                       disabledBackgroundColor: Colors.white,
                                     ),
                                     child: Text(

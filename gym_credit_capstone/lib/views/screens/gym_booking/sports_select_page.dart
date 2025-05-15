@@ -48,19 +48,19 @@ class _SportsSelectionPageState extends State<SportsSelectionPage> {
             ),
           ),
           Card(
-            margin: EdgeInsets.only(left: screenWidth * 0.1, top: 50),
+            margin: EdgeInsets.only(left: screenWidth * 0.1, top: 110),
             shadowColor: Colors.white.withAlpha(0),
             color: Colors.white.withAlpha(0),
             child: Text(widget.gymId, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),),
           ),
           Card(
-            margin: EdgeInsets.only(left: screenWidth * 0.1, top: 110),
+            margin: EdgeInsets.only(left: screenWidth * 0.1, top: 170),
             shadowColor: Colors.white.withAlpha(0),
             color: Colors.white.withAlpha(0),
             child: Text("종목선택", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),),
           ),
           Card(
-            margin: EdgeInsets.only(top: 140),
+            margin: EdgeInsets.only(top: 200),
             color:Colors.white,
             shadowColor: Colors.white.withAlpha(0),
             child: availableSports.isEmpty

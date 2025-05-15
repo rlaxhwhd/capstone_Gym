@@ -4,26 +4,29 @@ import '../data/models/user_model.dart';
 import '../data/repositories/user_repository.dart';
 
 class ProfileViewModel extends ChangeNotifier {
-  final UserRepository _userRepository;
+  final UserRepository _userRepository = UserRepository();
 
-  UserModel? _userModel;
-  bool _isLoading = true;
+  UserModel? _user;
+  UserModel? get user => _user;
 
-  ProfileViewModel({UserRepository? userRepository})
-      : _userRepository = userRepository ?? UserRepository() {
-    fetchUserData();
-  }
-
-  UserModel? get userModel => _userModel;
-  bool get isLoading => _isLoading;
+  final String appVersion = '25.0.0';
 
   Future<void> fetchUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final data = await _userRepository.getUserByEmail(user.email ?? '');
-      _userModel = data;
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      final userData = await _userRepository.getUserInfo(currentUser.uid, currentUser.email);
+      _user = userData;
+      notifyListeners();
     }
-    _isLoading = false;
-    notifyListeners();
+  }
+
+  Future<void> logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
+
+  void goToDeleteAccount(BuildContext context) {
+    Navigator.pushNamed(context, '/deleteAccount');
   }
 }

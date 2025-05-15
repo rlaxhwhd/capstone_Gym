@@ -1,24 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../models/user_model.dart';
 import 'auth_repository.dart';
 
 class UserRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final AuthRepository _authRepository; // 이제 선택적으로 받을 수 있음
+  final AuthRepository _authRepository;
 
-  // 생성자에서 AuthRepository를 직접 주입하도록 변경
   UserRepository({AuthRepository? authRepository})
       : _authRepository = authRepository ?? AuthRepository();
 
+  /// 유저 존재 여부 확인
   Future<bool> checkUserExists(String email) async {
     try {
-      final querySnapshot =
-      await _firestore
+      final querySnapshot = await _firestore
           .collection('users')
           .where('email', isEqualTo: email.trim())
           .get();
-
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       print('Error checking user existence: $e');
@@ -26,10 +25,10 @@ class UserRepository {
     }
   }
 
+  /// 이메일로 유저 정보 가져오기
   Future<UserModel?> getUserByEmail(String email) async {
     try {
-      final querySnapshot =
-      await _firestore
+      final querySnapshot = await _firestore
           .collection('users')
           .where('email', isEqualTo: email.trim())
           .get();
@@ -43,7 +42,25 @@ class UserRepository {
       return null;
     }
   }
-  //유저의 좋아요한 체육관 리스트 리턴하는 함수, userId가 없으면 기본으로 현재 사용자의 아이디 사용
+
+  /// 현재 유저의 uid와 email로 유저 정보 가져오기
+  Future<UserModel?> getUserInfo(String uid, String? email) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists && email != null) {
+        return UserModel.fromFirestore({
+          ...doc.data()!,
+          'email': email,
+        });
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching user info: $e');
+      return null;
+    }
+  }
+
+  /// 유저가 좋아요한 체육관 리스트 가져오기
   Future<List<String>> getLikedGymIds({String? userId}) async {
     userId ??= _authRepository.getCurrentUserId();
 
@@ -55,6 +72,7 @@ class UserRepository {
     try {
       DocumentSnapshot userDoc =
       await _firestore.collection('users').doc(userId).get();
+
       if (userDoc.exists && userDoc.data() != null) {
         var data = userDoc.data() as Map<String, dynamic>;
         return List<String>.from(data['favorite'] ?? []);
@@ -67,8 +85,7 @@ class UserRepository {
     }
   }
 
-
-  // 찜버튼 함수
+  /// 체육관 좋아요 토글
   Future<void> toggleLikedGym(String gymName, {String? userId}) async {
     userId ??= _authRepository.getCurrentUserId();
 
@@ -86,12 +103,10 @@ class UserRepository {
         final List<String> likedGyms = List<String>.from(data['favorite'] ?? []);
 
         if (likedGyms.contains(gymName)) {
-          // 이미 좋아요 되어 있으면 제거
           await userRef.update({
             'favorite': FieldValue.arrayRemove([gymName])
           });
         } else {
-          // 좋아요 안되어 있으면 추가
           await userRef.update({
             'favorite': FieldValue.arrayUnion([gymName])
           });
@@ -101,8 +116,4 @@ class UserRepository {
       print("Error toggling liked gym: $e");
     }
   }
-
-
-
-
 }

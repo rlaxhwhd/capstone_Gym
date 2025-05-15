@@ -105,7 +105,7 @@ class _PaymentPageState extends State<PaymentPage> {
     String dayOfWeek = dateUtils.getDayOfWeek(widget.formattedDate);
 
     Color backgroundColor = Colors.white; // 아래 배경 색상 정의
-    Color appBarColor = Colors.blue; // 버튼 색상 및 상단 색상으로 사용
+    Color appBarColor = Colors.lightBlueAccent; // 버튼 색상 및 상단 색상으로 사용
 
     return Scaffold(
       body: Container(
@@ -179,7 +179,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 contentPadding: EdgeInsets.zero, // 내부 여백 제거
                 controlAffinity: ListTileControlAffinity.leading, // 동그라미를 텍스트 왼쪽으로 이동
                 // 선택용 동그라미 크기 수정
-                activeColor: Colors.blue, // 선택된 동그라미 색상
+                activeColor: Colors.lightBlueAccent, // 선택된 동그라미 색상
                 selectedTileColor: Colors.grey.shade200, // 선택된 타일 배경색 (선택적)
               ),
               RadioListTile<String>(
@@ -196,7 +196,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 contentPadding: EdgeInsets.zero, // 내부 여백 제거
                 controlAffinity: ListTileControlAffinity.leading, // 동그라미를 텍스트 왼쪽으로 이동
                 // 선택용 동그라미 크기 수정
-                activeColor: Colors.blue, // 선택된 동그라미 색상
+                activeColor: Colors.lightBlueAccent, // 선택된 동그라미 색상
                 selectedTileColor: Colors.grey.shade200, // 선택된 타일 배경색 (선택적)
               ),
               RadioListTile<String>(
@@ -213,7 +213,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 contentPadding: EdgeInsets.zero, // 내부 여백 제거
                 controlAffinity: ListTileControlAffinity.leading, // 동그라미를 텍스트 왼쪽으로 이동
                 // 선택용 동그라미 크기 수정
-                activeColor: Colors.blue, // 선택된 동그라미 색상
+                activeColor: Colors.lightBlueAccent, // 선택된 동그라미 색상
                 selectedTileColor: Colors.grey.shade200, // 선택된 타일 배경색 (선택적)
               ),
               SizedBox(height: 24),

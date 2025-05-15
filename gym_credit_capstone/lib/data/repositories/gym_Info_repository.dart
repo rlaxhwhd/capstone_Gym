@@ -99,16 +99,4 @@ class GymInfoRepository {
     }
     return 'UnknownGym';
   }
-
-  /*Future<Map<String, dynamic>?> getGymDataFromFirestoreForPayment() async {
-    // Firestore instance 초기화
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Gym_list 컬렉션에서 gymName에 해당하는 문서 참조
-    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-    await firestore.collection('Gym_list').doc(widget.gymId).get();
-
-    // 문서 데이터 가져오기
-    return documentSnapshot.data();
-  }*/
 }

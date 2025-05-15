@@ -3,10 +3,10 @@ import '../../unsorted/selected_sports_list.dart'; // 선택한 스포츠를 보
 
 class SportsSelectForm extends StatefulWidget {
   @override
-  _SportsSelectionFormState createState() => _SportsSelectionFormState();
+  SportsSelectionFormState createState() => SportsSelectionFormState();
 }
 
-class _SportsSelectionFormState extends State<SportsSelectForm> {
+class SportsSelectionFormState extends State<SportsSelectForm> {
   final List<Map<String, IconData>> sports = [
     {'축구장': Icons.sports_soccer},
     {'테니스장': Icons.sports_tennis},
@@ -17,6 +17,18 @@ class _SportsSelectionFormState extends State<SportsSelectForm> {
     {'족구장': Icons.sports_football},
     {'풋살장': Icons.sports_soccer_outlined},
   ];
+
+  final Map<String, IconData> sportsMap =
+    {
+      '축구장': Icons.sports_soccer,
+      '테니스장': Icons.sports_tennis,
+      '탁구장': Icons.sports_handball,
+      '골프장': Icons.sports_golf,
+      '야구장': Icons.sports_baseball,
+      '배구장': Icons.sports_volleyball,
+      '족구장': Icons.sports_football,
+      '풋살장': Icons.sports_soccer_outlined
+    };
 
   final Set<String> selectedSports = {}; // 선택된 스포츠 저장
 

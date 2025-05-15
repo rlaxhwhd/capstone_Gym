@@ -7,6 +7,12 @@ import '../data/models/gym_booking_model.dart';
 class GymBookingViewModel extends ChangeNotifier {
   final GymInfoRepository _model = GymInfoRepository();
   final GymBookingModel _bookingModel = GymBookingModel();
+  int selectedDay = 0;
+  int selectedDayIndex = -1;
+  final List<String> weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+  List<DateTime> weekDates = [];
+
+  int todayIndex = DateTime.now().weekday % 7;
 
   late Function(DateTime) callCheckReservations;
 
@@ -19,6 +25,19 @@ class GymBookingViewModel extends ChangeNotifier {
   double totalPrice = 0.0;
 
   DocumentSnapshot? gymSnapshot;
+
+  void selectDay(int dayIndex, int day) {
+    selectedDayIndex = dayIndex;
+    selectedDay = day;
+    notifyListeners();
+  }
+
+  Future<void> generateWeekDates() async {
+    DateTime now = DateTime.now();
+    weekDates = List.generate(7, (index) => now.add(Duration(days: index)));
+    print("[DEBUG BOOKING VIEW MODEL] weekDates: ${weekDates}");
+    notifyListeners();
+  }
 
   List<String> generateAvailableTimes(String startTime, String endTime) {
     DateTime start = DateTime.parse("2025-01-01 $startTime:00");
@@ -44,26 +63,27 @@ class GymBookingViewModel extends ChangeNotifier {
   void updateSelectedDate(DateTime date) {
     selectedDate = date; // 🔹 클래스 멤버 변수 업데이트
 
-    print("[DEBUG] 선택된 날짜: $selectedDate"); // 🔹 디버깅용 로그 추가
+    print("[DEBUG BOOKING VIEW MODEL] 선택된 날짜: ${selectedDate}"); // 🔹 디버깅용 로그 추가
 
     if (selectedDate != null) { // 🔹 null 체크 추가
-      print("시간 확인 호출");
+      print("[DEBUG BOOKING VIEW MODEL] 시간 확인 호출");
 
       fetchReservations(selectedDate!); // 🔹 Firestore 데이터 가져오기
       callCheckReservations(selectedDate!); // 🔹 날짜 변경 후 예약 확인 실행
       notifyListeners(); // 🔹 UI 업데이트 반영
     } else {
-      print("[ERROR] 선택된 날짜가 null입니다.");
+      print("[ERROR BOOKING VIEW MODEL] 선택된 날짜가 null입니다.");
     }
   }
 
   void fetchNext7Days() {
-    List<DateTime> next7Days = List.generate(
-        7, (index) {
-      DateTime date = DateTime.now().add(Duration(days: index));
-      return DateTime(date.year, date.month, date.day); // 🔹 시간 제거
-    }
-    ); // 🔹 오늘부터 7일 생성
+    List<DateTime> next7Days = List.generate(7, (index) {
+        DateTime date = DateTime.now().toUtc().add(Duration(hours: 9)).add(Duration(days: index));
+        return DateTime(date.year, date.month, date.day); // 🔹 시간 제거
+      }
+    ); // 🔹 한국 시간 기준 오늘부터 7일 생성
+
+    print("한국 시간 기준 오늘부터 7일 생성");
 
     updateAvailableDates(next7Days); // 🔹 자동 호출
   }
@@ -71,6 +91,7 @@ class GymBookingViewModel extends ChangeNotifier {
   void updateAvailableDates(List<DateTime> dates) {
     availableDates = dates;
 
+    print("[DEBUG] dates: ${dates}");
     print("[DEBUG] 입력된 날짜 (시간 제거됨): ${dates.map((date) => date.toIso8601String().split('T')[0])}");
 
     notifyListeners(); // 🔹 UI 업데이트 반영
@@ -103,14 +124,6 @@ class GymBookingViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  /*Future<void> fetchGymData(String gymId) async {
-    try {
-      gymSnapshot = await FirebaseFirestore.instance.collection('Gym_list').doc(gymId).get();
-    } catch (e) {
-      print('체육관 데이터를 불러오는 중 오류 발생: $e');
-    }
-  }*/
 
   String formatDateTimeKST(DateTime dateTime) {
     // UTC+9 시간대로 변환

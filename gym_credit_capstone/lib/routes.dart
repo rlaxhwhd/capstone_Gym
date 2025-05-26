@@ -14,10 +14,15 @@ import 'views/screens/profile/delete_account_screen.dart';
 import 'views/screens/qrcode/qrcode_page.dart';
 import 'views/screens/schedule/schedule_page.dart';
 
+import 'views/screens/profile/nickname_change.dart';
+import 'views/screens/profile/phone_change.dart';
+import 'views/screens/profile/change_password.dart';
+import 'views/screens/profile/new_password.dart';
 import 'views/screens/gym_detail/gym_detail_page.dart';
 
 // ✅ 새로 추가
 import 'package:gym_credit_capstone/views/screens/unsorted/selected_sports_list.dart';
+import 'package:gym_credit_capstone/views/screens/profile/usage_history_screen.dart'; // ✅ 새로 추가
 
 class AppRoutes {
   static const String login = '/login';
@@ -34,6 +39,11 @@ class AppRoutes {
 
   // ✅ 새 route 추가
   static const String selectedSportsList = '/selected_sports_list';
+  static const String changeNickname = '/change_nickname';
+  static const String changePhone = '/change_phone';
+  static const String changePassword = '/change_password';
+  static const String newPassword = '/new_password';
+  static const String usageHistory = '/usage_history'; // ✅ 이용내역 추가
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -60,6 +70,14 @@ class AppRoutes {
         } else {
           return MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('User ID 없음'))));
         }
+      case newPassword:
+        return MaterialPageRoute(builder: (_) => const NewPasswordScreen());
+      case changePassword:
+        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+      case changePhone:
+        return MaterialPageRoute(builder: (_) => const PhoneChangeScreen());
+      case changeNickname:
+        return MaterialPageRoute(builder: (_) => const NicknameChangeScreen());
       case logOut:
         return MaterialPageRoute(builder: (_) => const DeleteAccountScreen());
       case selectedSportsList:
@@ -67,6 +85,8 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => SelectedSportsList(selectedSports: args),
         );
+      case usageHistory:
+        return MaterialPageRoute(builder: (_) => const UsageHistoryScreen()); // ✅ 추가
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(body: Center(child: Text('404 Not Found'))),

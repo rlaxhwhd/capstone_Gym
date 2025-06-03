@@ -139,6 +139,7 @@ class _GymBookingPageState extends State<GymBookingPage> {
     // 현재 날짜 가져오기
     DateTime today = DateTime.now();
 
+    int todayNumIndex = 0;
     int todayIndex = 0;
 
     // 오늘 요일을 기준으로 순서 변경
@@ -148,7 +149,8 @@ class _GymBookingPageState extends State<GymBookingPage> {
     List<DateTime> reorderedWeekDates = [];
 
     if(viewModel.weekDates.isNotEmpty) {
-      todayIndex = viewModel.weekDates.indexWhere((date) => date.day == today.day);
+      todayNumIndex = viewModel.weekDates.indexWhere((date) => date.day == today.day);
+      todayIndex = viewModel.todayIndex;
 
       // 오늘 요일을 기준으로 순서 변경
       reorderedWeekDays = [
@@ -158,8 +160,8 @@ class _GymBookingPageState extends State<GymBookingPage> {
 
       // 오늘 날짜를 기준으로 순서 변경
       reorderedWeekDates = [
-        ...viewModel.weekDates.sublist(todayIndex),
-        ...viewModel.weekDates.sublist(0, todayIndex)
+        ...viewModel.weekDates.sublist(todayNumIndex),
+        ...viewModel.weekDates.sublist(0, todayNumIndex)
       ];
     }
 
@@ -233,6 +235,7 @@ class _GymBookingPageState extends State<GymBookingPage> {
                           Row(
                             children: List.generate(reorderedWeekDates.length, (index) {
                               int day = reorderedWeekDates[index].day;
+
                               DateTime selectedDate = reorderedWeekDates[index];
 
                               return Expanded(

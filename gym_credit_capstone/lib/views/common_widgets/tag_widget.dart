@@ -48,7 +48,7 @@ class TagWidget extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(color: textColor, fontSize: fontSize ?? 14, fontWeight: FontWeight.bold, fontFamily: 'nanumgothic'),
+        style: TextStyle(color: textColor, fontSize: fontSize ?? 14, fontWeight: FontWeight.bold, fontFamily: 'NanumSquare'),
         overflow: TextOverflow.ellipsis,
       ),
     );

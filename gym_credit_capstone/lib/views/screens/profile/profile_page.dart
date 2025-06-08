@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/profile_view_model.dart';
 import '../../../routes.dart';
+import 'package:gym_credit_capstone/views/common_widgets/terms_dialog.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class ProfilePage extends StatelessWidget {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -128,13 +130,26 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  void _showAgreementDialog(
+      BuildContext context,
+      String title,
+      ) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => TermsDialog(
+        dialogTitle: title // 동의 처리 함수 전달
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ProfileViewModel>(
       create: (_) => ProfileViewModel()..fetchUserData(),
       child: Consumer<ProfileViewModel>(
         builder: (context, viewModel, child) {
-          final nickname = viewModel.user?.nickname ?? '';
+          final nickname = viewModel.user?.nickName ?? '';
           final email = viewModel.user?.email ?? '';
           return Scaffold(
             backgroundColor: Colors.white,
@@ -194,7 +209,9 @@ class ProfilePage extends StatelessWidget {
                   _buildItem('이용 내역', onTap: () {
                     Navigator.pushNamed(context, AppRoutes.usageHistory);
                   }),
-                  _buildItem('이용약관 및 정책', onTap: () {}),
+                  _buildItem('이용약관 및 정책', onTap: () {
+                    _showAgreementDialog(context, '서비스 이용 약관 동의');
+                  }),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
                     child: Row(

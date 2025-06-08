@@ -68,6 +68,7 @@ class GymInfoRepository {
     }
   }
 
+
   Future<List<String>> fetchGymSports(String gymId) async {
     final gymDetails = await fetchGymDetails(gymId);
     if (gymDetails != null && gymDetails.containsKey('종목')) {
@@ -98,5 +99,15 @@ class GymInfoRepository {
       return gymData['약자'] ?? 'UnknownGym'; // 🔹 약자 필드 가져오기
     }
     return 'UnknownGym';
+  }
+
+  Future<List<String>> getAllGymIdsOnly() async{
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection(_collectionPath).get();
+      return querySnapshot.docs.map((doc) => doc.id).toList();
+    } catch (e) {
+      print("Error fetching gym IDs: $e");
+      return [];
+    }
   }
 }

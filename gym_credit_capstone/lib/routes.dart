@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'views/screens/login/login_screen.dart';
-import 'views/screens/login/sign_up_screen.dart';
-import 'views/screens/login/find_password_screen.dart';
+import 'views/screens/sign_up//sign_up_screen.dart';
+import 'views/screens/find_password/find_password.dart';
 
 import 'views/screens/main_screen.dart';
 
@@ -52,7 +52,7 @@ class AppRoutes {
       case signUp:
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case findPassword:
-        return MaterialPageRoute(builder: (_) => const FindPasswordScreen());
+        return MaterialPageRoute(builder: (_) => const FindPassword());
       case home:
         return MaterialPageRoute(builder: (_) => const HomePage());
       case main:

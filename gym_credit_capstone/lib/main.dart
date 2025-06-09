@@ -7,13 +7,15 @@ import 'routes.dart';
 import 'view_models/liked_gym_view_model.dart';
 import 'view_models/delete_account_viewmodel.dart';
 import 'view_models/selected_sports_list_view_model.dart';
-import 'view_models/gym_booking_view_model.dart'; // GymBookingViewModel 추가
-import 'view_models/schedule_view_model.dart'; // GymBookingViewModel 추가
-import 'view_models/main_view_model.dart'; // GymBookingViewModel 추가
+import 'view_models/gym_booking_view_model.dart';
+import 'view_models/schedule_view_model.dart';
+import 'view_models/main_view_model.dart';
+import 'view_models/meetup_view_model.dart';
 
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/user_repository.dart';
 import 'data/repositories/gym_info_repository.dart';
+import 'data/repositories/meetup_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,7 @@ void main() async {
   final authRepository = AuthRepository();
   final userRepository = UserRepository(authRepository: authRepository);
   final gymInfoRepository = GymInfoRepository();
+  final meetupRepository = MeetupRepository();
 
   await NaverMapSdk.instance.initialize(clientId: '19yms2ttr3'); // 네이버 맵 SDK 초기화
 
@@ -36,13 +39,17 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => DeleteAccountViewModel()),
         ChangeNotifierProvider(
-          create: (_) => SelectedSportsListViewModel(gymInfoRepository: gymInfoRepository),
+          create: (_) =>
+              SelectedSportsListViewModel(gymInfoRepository: gymInfoRepository),
         ),
-        ChangeNotifierProvider(
-          create: (_) => GymBookingViewModel(), // GymBookingViewModel 추가
-        ),
+        ChangeNotifierProvider(create: (_) => GymBookingViewModel()),
         ChangeNotifierProvider(create: (_) => MainViewModel()),
         ChangeNotifierProvider(create: (_) => ScheduleViewModel()),
+
+        // ✅ MeetupViewModel 추가!
+        ChangeNotifierProvider(
+          create: (_) => MeetupViewModel(meetupRepository),
+        ),
       ],
       child: const MyApp(),
     ),

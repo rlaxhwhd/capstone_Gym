@@ -5,141 +5,210 @@ import 'package:provider/provider.dart';
 import 'package:gym_credit_capstone/view_models/meetup_view_model.dart';
 import 'package:gym_credit_capstone/views/screens/meetup/meetup_create_page.dart';
 
-class MeetupPage extends StatelessWidget {
+class MeetupPage extends StatefulWidget {
   const MeetupPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final meetupViewModel = context.watch<MeetupViewModel>();
+  State<MeetupPage> createState() => _MeetupPageState();
+}
 
-    // 오늘부터 7일치 날짜 생성
-    final List<DateTime> days = List.generate(
-      7,
-          (index) => DateTime.now().add(Duration(days: index)),
-    );
+class _MeetupPageState extends State<MeetupPage> {
+  late DateTime selectedDate;
+  late List<DateTime> weekDates;
+  late int todayIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    // 초기 선택 날짜는 오늘
+    selectedDate = DateTime.now();
+
+    // 이번 주(일요일 시작) 7일치 날짜 계산
+    final now = DateTime.now();
+    todayIndex = now.weekday % 7;
+    final sunday = now.subtract(Duration(days: todayIndex));
+    weekDates = List.generate(7, (i) => sunday.add(Duration(days: i)));
+
+    // 모임 데이터 불러오기
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MeetupViewModel>().fetchAllMeetups();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<MeetupViewModel>();
+    final allMeetups = vm.meetups;
+
+    // 선택된 날짜의 모임만 필터
+    final todaysMeetups = allMeetups.where((m) =>
+    m.meetupTime.year == selectedDate.year &&
+        m.meetupTime.month == selectedDate.month &&
+        m.meetupTime.day == selectedDate.day
+    ).toList();
+
+    const weekDayLabels = ['일','월','화','수','목','금','토'];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1) 맨 위 "스포츠 모임" (가운데 정렬)
+            // 상단 타이틀
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
               child: Center(
                 child: Text(
                   "스포츠 모임",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            // 2) "모임 일정 캘린더" 왼쪽 정렬 + 검색 아이콘(오른쪽)
+
+            // 서브 타이틀 + 검색
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     "모임 일정 캘린더",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      // TODO: 검색 로직을 여기에 추가하거나, 검색 화면으로 이동
-                    },
+                    icon: Icon(Icons.search),
+                    onPressed: () {},
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 6),
-            // 3) 가로 스크롤 캘린더
+
+            // 월 표시
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SizedBox(
-                height: 60,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: days.length,
-                  itemBuilder: (context, index) {
-                    final day = days[index];
-                    final formattedDate = "${day.month}/${day.day}";
-                    final isToday = day.year == DateTime.now().year &&
-                        day.month == DateTime.now().month &&
-                        day.day == DateTime.now().day;
-
-                    // 요일 얻기 (일 ~ 토)
-                    final weekdayLabel = ["일", "월", "화", "수", "목", "금", "토"][day.weekday % 7];
-
-                    return Container(
-                      width: 50,
-                      margin: const EdgeInsets.only(right: 8.0),
-                      decoration: BoxDecoration(
-                        color: isToday ? const Color(0xFF69B7FF) : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // 오늘이면 "오늘" 표시, 아니면 weekdayLabel
-                          Text(
-                            isToday ? "오늘" : weekdayLabel,
-                            style: TextStyle(
-                              color: isToday ? Colors.white : Colors.black87,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            formattedDate,
-                            style: TextStyle(
-                              color: isToday ? Colors.white : Colors.black87,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                "${selectedDate.month}월",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
             ),
-            const SizedBox(height: 12),
 
-            // (생략) 모임 목록 영역
+            Divider(color: Colors.black.withAlpha(40), thickness: 1),
+
+            // 요일 행
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Row(
+                children: List.generate(7, (i) {
+                  return Expanded(
+                    child: Center(
+                      child: Text(
+                        weekDayLabels[i],
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+            // 날짜 행 (오직 selectedDate 만 파란색)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: List.generate(7, (i) {
+                  final date = weekDates[i];
+                  final isSelected = date.year == selectedDate.year &&
+                      date.month == selectedDate.month &&
+                      date.day == selectedDate.day;
+
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () {
+                          setState(() {
+                            selectedDate = date;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFF69B7FF) : Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withAlpha(30),
+                                spreadRadius: 2,
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${date.day}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+            Divider(color: Colors.black.withAlpha(40), thickness: 1),
+
+            // 모임 목록 또는 안내 문구
             Expanded(
-              child: Center(
+              child: vm.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : todaysMeetups.isEmpty
+                  ? Center(
                 child: Text(
-                  "등록된 모임이 없습니다.\n+ 버튼을 눌러 모임을 등록하세요.",
+                  "선택된 날짜에 등록된 모임이 없습니다.\n+ 버튼을 눌러 모임을 등록하세요.",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
+              )
+                  : ListView.builder(
+                itemCount: todaysMeetups.length,
+                itemBuilder: (_, idx) {
+                  final m = todaysMeetups[idx];
+                  final timeStr =
+                      "${m.meetupTime.hour.toString().padLeft(2, '0')}:${m.meetupTime.minute.toString().padLeft(2, '0')}";
+                  return ListTile(
+                    leading: Icon(Icons.group),
+                    title: Text(m.title),
+                    subtitle: Text("${m.gymName} / ${m.capacity}명"),
+                    trailing: Text(timeStr),
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
 
-      // 우측 하단 + 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const MeetupCreatePage()),
-          );
-        },
-        child: const Icon(Icons.add),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MeetupCreatePage()),
+        ),
+        child: Icon(Icons.add),
       ),
     );
   }

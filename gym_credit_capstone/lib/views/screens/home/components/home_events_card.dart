@@ -19,6 +19,7 @@ class HomeCard extends StatelessWidget {
 
             return Card(
               //clipBehavior: Clip.none,
+              color: Colors.white,
               elevation: 4,
              // margin: EdgeInsets.only(bottom: 1),
               shape: RoundedRectangleBorder(

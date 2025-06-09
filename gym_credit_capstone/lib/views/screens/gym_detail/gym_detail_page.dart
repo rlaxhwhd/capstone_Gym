@@ -8,6 +8,7 @@ import 'package:gym_credit_capstone/views/screens/gym_detail/components/gym_book
 import 'package:gym_credit_capstone/views/screens/gym_detail/components/gym_tabs/info_tab.dart';
 import 'package:gym_credit_capstone/views/screens/gym_detail/components/gym_tabs/map_tab.dart';
 import 'package:gym_credit_capstone/views/screens/gym_detail/components/gym_tabs/rules_tab.dart';
+import 'package:gym_credit_capstone/style/custom_colors.dart';
 
 class GymDetailPage extends StatelessWidget {
   final String gymId;
@@ -25,11 +26,12 @@ class GymDetailPage extends StatelessWidget {
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
+          backgroundColor: Colors.white,
           body: SafeArea(
             child: Consumer<GymDetailViewModel>(
               builder: (context, viewModel, child) {
                 if (viewModel.isLoading || viewModel.gymInfo == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: CustomColors.primaryColor,));
                 }
 
                 return Column(

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_credit_capstone/data/repositories/gym_info_repository.dart';
 import 'package:gym_credit_capstone/data/repositories/user_repository.dart';
+
 import 'package:provider/provider.dart';
-import '../../../view_models/background_view_model.dart';
+import 'package:gym_credit_capstone/view_models/background_view_model.dart';
 import 'components/background_img.dart';
-import '../../../view_models/liked_gym_view_model.dart';
+import 'package:gym_credit_capstone/view_models/liked_gym_view_model.dart';
+import 'package:gym_credit_capstone/style/custom_colors.dart';
 import 'components/home_events_card.dart';
 import 'components/sports_select_form.dart';
 import 'components/sliderWithIndicator.dart';
@@ -26,9 +28,22 @@ class _HomePageState extends State<HomePage> {
       selectedSports = sports; // 사용자가 선택한 종목 업데이트
     });
   }
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final imageHeight = screenHeight * 0.18;
     // 상단바 설정을 한 번만 적용
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -37,11 +52,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    // edge-to-edge 모드 설정
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge,
-      overlays: [SystemUiOverlay.top],
-    );
 
     return MultiProvider(
       providers: [
@@ -54,9 +64,9 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         extendBodyBehindAppBar: true,
-        // 투명한 AppBar 추가
+        backgroundColor: Colors.white,
+        //투명한 AppBar 추가
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0),
           child: AppBar(
@@ -72,20 +82,18 @@ class _HomePageState extends State<HomePage> {
           builder: (context, viewModel, child) {
             print("Consumer 빌드 시작");
             if (viewModel.isLoading) {
-              return Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator(
+                color: CustomColors.primaryColor,
+              ));
             }
-            if (viewModel.likedGyms.isEmpty) {
-              return Center(child: Text("좋아요한 체육관이 없습니다."));
-            }
-            return SafeArea(
-              top: false, // 상단 SafeArea 비활성화하여 콘텐츠가 상단까지 차지하도록 함
-              child: RefreshIndicator(
+            return RefreshIndicator(
                 onRefresh: () async {
                   await viewModel.fetchLikedGyms();
                 },
+                color: CustomColors.primaryColor,
                 child: ListView(
                   children: [
-                    BackgroundImg(),
+                    BackgroundImg(imageHeight: imageHeight),
                     SizedBox(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,16 +105,16 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               children: [
                                 Text(
-                                  "즐겨찾기한 체육관",
+                                  viewModel.hasFavorites ? "즐겨찾기한 체육관" : "체육관 추천",
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w800,
-                                    fontFamily: "NanumGothic",
+                                    fontFamily: "NanumSquare",
                                   ),
                                 ),
                                 const SizedBox(width: 6),
                                 Tooltip(
-                                  message: '자주 가는 체육관을 빠르게 볼 수 있어요',
+                                  message: viewModel.hasFavorites ?  '자주 가는 체육관을 빠르게 볼 수 있어요' : '랜덤의 체육관이 추천돼요',
                                   child: Icon(
                                     Icons.info_outline,
                                     size: 18,
@@ -116,6 +124,7 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
+
 
                           // 텍스트와 카드 사이의 간격을 최소화
                           const SizedBox(height: 8),
@@ -154,14 +163,13 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 30),
                     SportsSelectForm(), // 종목 선택 컴포넌트 추가
-                    SizedBox(height: 16),
+                    SizedBox(height: 50),
                     SliderWithIndicator(),
                   ],
                 ),
-              ),
-            );
+              );
           },
         ),
       ),

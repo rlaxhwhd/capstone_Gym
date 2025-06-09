@@ -8,7 +8,9 @@ class SuccessScreen extends StatelessWidget {
     // 로그인 성공 메시지와 함께 메인 화면으로 이동
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacementNamed(context, '/main');
+
     });
+
 
     return Scaffold(
       body: Center(

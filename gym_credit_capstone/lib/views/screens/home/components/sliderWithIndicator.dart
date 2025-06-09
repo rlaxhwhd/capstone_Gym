@@ -10,9 +10,9 @@ class SliderWithIndicator extends StatefulWidget {
 
 class _SliderWithIndicatorState extends State<SliderWithIndicator> {
   final List<String> images = [
-    'assets/events.jpg',
-    'assets/events.jpg',
-    'assets/events.jpg',
+    'assets/images/events/event1.jpg',
+    'assets/images/events/event2.jpg',
+    'assets/images/events/event3.jpg',
   ];
 
   final List<String> links = [
@@ -27,7 +27,7 @@ class _SliderWithIndicatorState extends State<SliderWithIndicator> {
   void _launchURL(String url) async {
     Uri uri = Uri.parse(url); // URL을 Uri 객체로 변환
     if (await canLaunchUrl(uri)) { // URL을 열 수 있는지 확인
-      await launchUrl(uri); // URL 열기
+      await launchUrl(uri, mode: LaunchMode.externalApplication); // URL 열기
     } else {
       // URL을 열 수 없을 경우 오류 메시지
       ScaffoldMessenger.of(context).showSnackBar(

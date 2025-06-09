@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../unsorted/selected_sports_list.dart'; // 선택한 스포츠를 보여줄 페이지 import
+import 'package:gym_credit_capstone/style/custom_colors.dart';
 
 class SportsSelectForm extends StatefulWidget {
   @override
@@ -72,14 +73,14 @@ class SportsSelectionFormState extends State<SportsSelectForm> {
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
-                          fontFamily: "NanumGothic"),
+                          fontFamily: "NanumSquare"),
                     ),
                     TextSpan(
                       text: "근처에 이용가능한 체육관들을 확인해보세요!",
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          fontFamily: "NanumGothic"),
+                          fontFamily: "NanumSquare"),
                     ),
                   ],
                 ),
@@ -97,6 +98,8 @@ class SportsSelectionFormState extends State<SportsSelectForm> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
+                        fontFamily: "NanumSquare",
+                        color: CustomColors.primaryColor
                       ),
                     ),
                   ],
@@ -105,7 +108,7 @@ class SportsSelectionFormState extends State<SportsSelectForm> {
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
 
         // 아이콘 버튼 리스트
         Padding(
@@ -117,7 +120,7 @@ class SportsSelectionFormState extends State<SportsSelectForm> {
               crossAxisCount: 4, // 한 줄에 4개씩
               crossAxisSpacing: 30,
               mainAxisSpacing: 40,
-              childAspectRatio: 0.8, // 텍스트를 위한 공간 확보를 위해 비율 조정
+              childAspectRatio: 0.67, // 텍스트를 위한 공간 확보를 위해 비율 조정
             ),
             itemCount: sports.length,
             itemBuilder: (context, index) {
@@ -152,11 +155,11 @@ class SportsSelectionFormState extends State<SportsSelectForm> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 5), // 아이콘과 텍스트 사이 간격
+                    SizedBox(height: 10), // 아이콘과 텍스트 사이 간격
                     Text(
                       name,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         color: isSelected ? Color(0xff69b7ff) : Colors.black87,
                       ),

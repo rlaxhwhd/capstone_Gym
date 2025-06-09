@@ -7,7 +7,6 @@ import 'profile/profile_page.dart';
 import 'meetup/meetup_page.dart';
 import 'qrcode/qrcode_page.dart';
 import 'package:flutter/services.dart';
-//import 'package:gym_credit_capstone/views/screens/schedule/schedule_page.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -20,6 +19,7 @@ class MainScreen extends StatelessWidget {
       child: Consumer<MainViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
+            backgroundColor: Colors.white,
             body: IndexedStack(
               index: viewModel.currentIndex, // 현재 선택된 탭 인덱스
               children: [
@@ -31,6 +31,7 @@ class MainScreen extends StatelessWidget {
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: Colors.white,
               currentIndex: viewModel.currentIndex,
               onTap: (index) {
                 viewModel.changeTab(index); // 탭 변경 시 상태 업데이트

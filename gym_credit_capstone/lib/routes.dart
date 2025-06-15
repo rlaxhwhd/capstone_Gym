@@ -43,7 +43,7 @@ class AppRoutes {
   static const String changePhone = '/change_phone';
   static const String changePassword = '/change_password';
   static const String newPassword = '/new_password';
-  static const String usageHistory = '/usage_history'; // ✅ 이용내역 추가
+  static const String usageHistory = '/usage_history';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {

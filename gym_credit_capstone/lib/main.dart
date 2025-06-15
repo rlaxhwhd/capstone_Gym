@@ -14,6 +14,7 @@ import 'view_models/gym_booking_view_model.dart';
 import 'view_models/schedule_view_model.dart';
 import 'view_models/main_view_model.dart';
 import 'view_models/meetup_view_model.dart';
+import 'view_models/usage_history_viewmodel.dart';
 
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/user_repository.dart';
@@ -65,7 +66,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => GymBookingViewModel()),
         ChangeNotifierProvider(create: (_) => MainViewModel()),
         ChangeNotifierProvider(create: (_) => ScheduleViewModel()),
-
+        ChangeNotifierProvider(create: (_) => UsageHistoryViewModel()),
         // ✅ MeetupViewModel 추가!
         ChangeNotifierProvider(
           create: (_) => MeetupViewModel(meetupRepository),
